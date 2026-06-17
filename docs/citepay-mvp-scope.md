@@ -2,7 +2,7 @@
 
 ## Objective
 
-Build the next safe local demo layer on top of AgentPay Guard: mock paid creator/source cards that an agent can select, producing payment intents for the existing Guard API.
+Document the implemented local demo layer on top of AgentPay Guard: mock paid creator/source cards that an agent can select, producing payment intents for the existing Guard API.
 
 This is a product-scope extension, not a payment integration.
 
@@ -20,13 +20,13 @@ The implementation does not add real payments, wallets, live integrations, datab
 
 ## In Scope For The Implemented Local Slice
 
-- Add mock creator/source cards with title, creator/source id, short description, price, currency, intended citation/use case, and trust/risk hints.
-- Add an agent-side selection flow where a user can select one source at a time and evaluate the generated payment intent.
-- Reuse `POST /api/payment-intents/evaluate` without changing real payment behavior.
-- Show Guard output for each selected source: decision, risk score, reason, matched rules, audit id, and recent audit entries.
-- Keep all source prices as decimal strings.
-- Keep the audit log at `data/audit-log.jsonl`.
-- Keep the MVP local with no external service calls.
+- Mock creator/source cards with title, creator/source id, short description, price, currency, intended citation/use case, and trust/risk hints.
+- An agent-side selection flow where a user can evaluate generated payment intents from the local source catalog.
+- Reuse of `POST /api/payment-intents/evaluate` without changing real payment behavior.
+- Guard output for each selected source: decision, risk score, reason, matched rules, audit id, and recent audit entries.
+- Decimal-string source prices only.
+- The audit log remains at `data/audit-log.jsonl`.
+- The MVP remains local with no external service calls.
 
 ## Out Of Scope For This Phase
 
@@ -51,7 +51,7 @@ Do not start these without a separate explicit request:
 
 ## Payment Intent Mapping
 
-Each selected mock source should generate a normal AgentPay Guard payment intent:
+Each selected mock source generates a normal AgentPay Guard payment intent shape like:
 
 ```json
 {
@@ -79,8 +79,8 @@ The current policy may return `REVIEW` for unknown recipients. That is acceptabl
 
 ## Documentation Boundary
 
-`README.md` and `REQUIREMENTS.md` remain unchanged in the first documentation-only phase. The current AgentPay Guard MVP boundary remains intact until a later implementation changes behavior.
+The current AgentPay Guard MVP boundary remains intact. README and related proof-pack docs now describe CitePay Agent as an additive local demo on top of the existing Guard foundation.
 
 ## Next Safe Step
 
-Capture updated CitePay demo screenshots using the built-in preset.
+Finalize the proof-pack consistency review and submission draft using the existing preset screenshots.

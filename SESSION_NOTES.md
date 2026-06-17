@@ -734,3 +734,55 @@ Pending fresh verification:
 - `pnpm build`
 
 No staging or commit before those commands pass.
+
+## 2026-06-17 - Proof-pack consistency review and Lepton submission draft
+
+### Context
+
+Reviewed the current Lepton/CitePay proof pack against the actual local preset screenshots and added a concise hackathon submission draft.
+
+Goal: make the submission narrative match the current branch state exactly, without code changes or any claim of live payments, official integrations, traction, or production readiness.
+
+### Consistency issues found
+
+- `docs/lepton-citepay-brief.md` still described the paid-source selection flow as a future implementation phase even though the local flow and screenshots already exist.
+- `docs/citepay-mvp-scope.md` still used some forward-looking wording (`Add`, `should generate`) and an outdated next step (`Capture updated CitePay demo screenshots`).
+- `docs/citepay-mvp-scope.md` still referenced the older documentation-only boundary where `README.md` stayed unchanged, which no longer matched the current branch state.
+- `STATE.md` still described the target demo primarily as the original 3 Guard scenarios instead of the current CitePay preset proof-pack.
+
+### Files changed
+
+- `docs/lepton-citepay-brief.md`
+- `docs/citepay-mvp-scope.md`
+- `docs/lepton-submission-draft.md`
+- `STATE.md`
+- `TASKS.md`
+- `SESSION_NOTES.md`
+
+### What changed
+
+- Updated the Lepton brief to describe the current demo state and the next safe proof-pack step.
+- Updated the CitePay MVP scope doc to describe the implemented local slice in present tense and point to the correct next documentation step.
+- Added `docs/lepton-submission-draft.md` with project summary, implemented scope, omitted scope, Guard fit, intended Lepton/RFB fit, demo steps, video outline, and risk disclosure.
+- Updated `STATE.md`, `TASKS.md`, and this session log so tracker files match the current proof-pack and submission state.
+
+### Boundary kept intact
+
+- No code changes.
+- No app behavior changes.
+- No real payments.
+- No wallet signing.
+- No live Circle/x402/Arc integration.
+- No secrets, env vars, database/auth, smart contracts, or external services.
+- No claims of real users, traction, partnership, prizes, grants, or production readiness.
+
+### Validation status
+
+Pending fresh verification:
+
+- `pnpm test`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+
+No staging or commit before those commands pass.

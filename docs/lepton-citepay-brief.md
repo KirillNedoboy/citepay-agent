@@ -27,13 +27,13 @@ The first Lepton phase is a local product proof, not a live payment integration.
 
 CitePay does not replace the existing Guard API.
 
-It should produce the same payment intent shape already accepted by:
+It produces the same payment intent shape already accepted by:
 
 ```http
 POST /api/payment-intents/evaluate
 ```
 
-Mock creator/source cards should map to fields like:
+Mock creator/source cards map to fields like:
 
 - `agentId`: the agent selecting paid sources.
 - `intent`: a readable payment purpose, such as paying to cite a premium research note.
@@ -72,9 +72,18 @@ The Lepton-facing story is:
 
 This keeps the project grounded in the existing AgentPay Guard proof while making the user-facing demo more specific to AI agents and paid creator/source content.
 
-## Next Safe Implementation Phase
+## Current Demo State
 
-Add mock creator source cards and an agent-side paid source selection flow that produces payment intents for the existing Guard API.
+The current branch already includes a local deterministic CitePay demo:
 
-This phase should stay local and deterministic. It should reuse the current API, current policy engine, and current JSONL audit behavior.
+- mock paid creator/source cards;
+- deterministic source selection from the preset query;
+- Guard evaluation for each selected source through the existing API;
+- screenshot-backed proof of `ALLOW`, `REVIEW`, and `BLOCK`;
+- proposed spend versus allowed spend.
 
+The demo remains local-only and keeps the existing AgentPay Guard audit behavior intact.
+
+## Next Safe Proof-Pack Step
+
+Finalize the concise hackathon submission narrative around the existing local demo and screenshots without adding live payment execution, wallet signing, custody, DB/auth, or smart contracts.
