@@ -274,6 +274,144 @@ li {
   margin-top: 18px;
 }
 
+.citepay {
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfd;
+  padding: 20px;
+}
+
+.citepay .section-heading {
+  margin-bottom: 16px;
+}
+
+.citepay-grid,
+.citepay-results {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+  gap: 18px;
+}
+
+.citepay-results {
+  margin-top: 18px;
+}
+
+.source-list {
+  display: grid;
+  gap: 10px;
+}
+
+.source-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  padding: 12px;
+}
+
+.source-card strong,
+.source-card span {
+  display: block;
+}
+
+.source-card span,
+.source-card p {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.source-card p {
+  margin: 10px 0;
+  line-height: 1.45;
+}
+
+.source-card dl {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 10px 0 0;
+}
+
+.preset-strip {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #edf6f4;
+  margin-bottom: 14px;
+  padding: 12px;
+}
+
+.preset-strip strong,
+.preset-strip span {
+  display: block;
+}
+
+.preset-strip span {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.preset-strip button {
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 8px 10px;
+}
+
+.totals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.totals span {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #edf6f4;
+  color: #12433f;
+  font-weight: 700;
+  padding: 10px;
+}
+
+.decision-line.compact {
+  margin-bottom: 10px;
+}
+
+.decision-line.compact strong {
+  font-size: 16px;
+}
+
+.decision-line.compact span {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.skipped-list {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+}
+
+.skipped-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  padding: 10px;
+}
+
+.skipped-list span {
+  color: var(--muted);
+}
+
 .section-heading {
   display: flex;
   justify-content: space-between;
@@ -318,8 +456,16 @@ th {
 
   .architecture,
   .scenario-grid,
-  .form-grid {
+  .form-grid,
+  .citepay-grid,
+  .citepay-results,
+  .totals,
+  .preset-strip {
     grid-template-columns: 1fr;
+  }
+
+  .preset-strip {
+    display: grid;
   }
 
   h1 {

@@ -1,6 +1,6 @@
-# TASKS.md — Build Plan
+# TASKS.md - Build Plan
 
-## Phase 0 — Starter pack
+## Phase 0 - Starter pack
 
 - [x] Define product.
 - [x] Write requirements.
@@ -9,7 +9,7 @@
 - [x] Add default policy config.
 - [x] Add grant/demo docs.
 
-## Phase 1 — Core backend
+## Phase 1 - Core backend
 
 - [x] Create TypeScript app scaffold.
 - [x] Add request validation.
@@ -22,7 +22,7 @@
 - [x] Read recent audit log entries.
 - [x] Add tests for all demo scenarios.
 
-## Phase 2 — Demo UI
+## Phase 2 - Demo UI
 
 - [x] Add single page demo.
 - [x] Add scenario selector.
@@ -32,7 +32,7 @@
 - [x] Add audit log table.
 - [x] Add architecture strip.
 
-## Phase 3 — Proof pack
+## Phase 3 - Proof pack
 
 - [x] Finalize README.
 - [x] Finalize `docs/grant-draft.md`.
@@ -49,11 +49,44 @@
 - [x] Verify repo hygiene for publication.
 - [ ] Prepare GitHub repo.
 
-## Do not start without explicit request
+## Phase 4 - Lepton/CitePay documentation pivot
+
+- [x] Create `docs/lepton-citepay-brief.md`.
+- [x] Create `docs/citepay-mvp-scope.md`.
+- [x] Update `STATE.md` with the CitePay direction.
+- [x] Update `TASKS.md` with the CitePay documentation and next implementation phase.
+- [x] Append a CitePay planning entry to `SESSION_NOTES.md`.
+- [x] Keep `README.md` and `REQUIREMENTS.md` unchanged for this documentation-only phase.
+
+## Next safe implementation phase
+
+## Phase 5 - CitePay local MVP code slice
+
+- [x] Add mock creator source cards in code.
+- [x] Add deterministic source selection by query relevance.
+- [x] Add decimal-string budget cap behavior.
+- [x] Map selected sources to existing Guard-compatible payment intents.
+- [x] Evaluate selected source intents through `POST /api/payment-intents/evaluate`.
+- [x] Display selected sources, skipped sources, Guard decisions, proposed spend, and allowed spend in the local UI.
+- [x] Preserve existing AgentPay Guard scenarios and audit behavior.
+- [x] Keep the implementation local and deterministic.
+- [x] Add unit tests for selection relevance, budget caps, payment-intent mapping, and Guard REVIEW/BLOCK propagation.
+- [x] Add deterministic Lepton/CitePay demo preset query and budget.
+- [x] Add `docs/citepay-demo-script.md` with the local paid-source selection demo flow.
+
+## Next safe implementation phase
+
+- [x] Capture updated CitePay demo screenshots:
+  - [x] `screenshots/05-citepay-preset-loaded.png`
+  - [x] `screenshots/06-citepay-guard-decisions.png`
+  - [x] `screenshots/07-citepay-spend-summary.png`
+- [ ] Keep payment execution, signing, live integrations, DB/auth, and smart contracts out of scope.
+
+## Do not start yet without explicit request
 
 - [ ] Live Circle Gateway integration.
-- [ ] Real x402 seller/buyer payment.
+- [ ] Real x402 buyer/seller payment.
 - [ ] Wallet signing.
+- [ ] Custody/private key handling.
+- [ ] DB/auth.
 - [ ] Smart contracts.
-- [ ] Database.
-- [ ] Auth.

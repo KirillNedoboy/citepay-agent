@@ -1,8 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import {
+  citePayDemoPreset,
+  citePayMockSources,
+  selectCitePaySources
+} from "@/domain/citepay/source-selection";
+import type { CitePaySelectedSource, CitePaySelectionResult } from "@/domain/citepay/types";
 import type { AuditRecord } from "@/domain/audit/types";
 import type { PaymentIntent } from "@/domain/payment-intent/types";
+import { addDecimalStrings } from "@/lib/decimal";
 
 export type Scenario = {
   label: string;
@@ -23,6 +30,10 @@ type EvaluationResult = {
 
 type FieldName = keyof PaymentIntent;
 
+type CitePayEvaluatedSource = CitePaySelectedSource & {
+  result: EvaluationResult;
+};
+
 const fieldLabels: Array<[FieldName, string]> = [
   ["agentId", "Agent ID"],
   ["intent", "Intent"],
@@ -42,6 +53,12 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
   const [records, setRecords] = useState<AuditRecord[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [citePayQuery, setCitePayQuery] = useState<string>(citePayDemoPreset.query);
+  const [citePayBudget, setCitePayBudget] = useState<string>(citePayDemoPreset.budget);
+  const [citePaySelection, setCitePaySelection] = useState<CitePaySelectionResult | null>(null);
+  const [citePayEvaluations, setCitePayEvaluations] = useState<CitePayEvaluatedSource[]>([]);
+  const [citePayIsSubmitting, setCitePayIsSubmitting] = useState(false);
+  const [citePayError, setCitePayError] = useState<string | null>(null);
 
   useEffect(() => {
     setForm(selectedScenario.intent);
@@ -81,7 +98,57 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
     }
   }
 
+  function loadCitePayDemoPreset() {
+    setCitePayQuery(citePayDemoPreset.query);
+    setCitePayBudget(citePayDemoPreset.budget);
+    setCitePaySelection(null);
+    setCitePayEvaluations([]);
+    setCitePayError(null);
+  }
+
+  async function runCitePayFlow() {
+    setCitePayIsSubmitting(true);
+    setCitePayError(null);
+    setCitePayEvaluations([]);
+
+    const selection = selectCitePaySources({
+      agentId: citePayDemoPreset.agentId,
+      query: citePayQuery,
+      budget: citePayBudget,
+      sources: citePayMockSources
+    });
+    setCitePaySelection(selection);
+
+    try {
+      const evaluations: CitePayEvaluatedSource[] = [];
+      for (const selected of selection.selected) {
+        const response = await fetch("/api/payment-intents/evaluate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(selected.paymentIntent)
+        });
+        const data = (await response.json()) as EvaluationResult;
+        evaluations.push({ ...selected, result: data });
+        if (!response.ok) {
+          setCitePayError(data.reason);
+        }
+      }
+      setCitePayEvaluations(evaluations);
+      await refreshAuditLog();
+    } catch {
+      setCitePayError("CitePay evaluation failed locally.");
+    } finally {
+      setCitePayIsSubmitting(false);
+    }
+  }
+
   const decisionClass = useMemo(() => result?.decision.toLowerCase() ?? "empty", [result]);
+  const totalAllowedSpend = useMemo(() => {
+    const allowedAmounts = citePayEvaluations
+      .filter((item) => item.result.decision === "ALLOW")
+      .map((item) => item.source.price);
+    return addDecimalStrings(allowedAmounts) ?? "0";
+  }, [citePayEvaluations]);
 
   return (
     <main className="shell">
@@ -162,6 +229,138 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
           ) : (
             <p>Select a scenario and evaluate it to see the guard decision.</p>
           )}
+        </div>
+      </section>
+
+      <section className="citepay">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">CitePay Agent local flow</p>
+            <h2>Paid source selection</h2>
+          </div>
+          <div className="boundary">Mock sources only. Guard evaluation only. No payment execution.</div>
+        </div>
+
+        <div className="citepay-grid">
+          <div className="panel">
+            <h3>Agent request</h3>
+            <div className="preset-strip">
+              <div>
+                <strong>{citePayDemoPreset.label}</strong>
+                <span>
+                  {citePayDemoPreset.budget} USDC budget
+                </span>
+              </div>
+              <button onClick={loadCitePayDemoPreset} type="button">
+                Load preset
+              </button>
+            </div>
+            <div className="form-grid">
+              <label className="wide">
+                <span>User question</span>
+                <input value={citePayQuery} onChange={(event) => setCitePayQuery(event.target.value)} />
+              </label>
+              <label>
+                <span>Budget cap</span>
+                <input value={citePayBudget} onChange={(event) => setCitePayBudget(event.target.value)} />
+              </label>
+              <label>
+                <span>Agent ID</span>
+                <input readOnly value={citePayDemoPreset.agentId} />
+              </label>
+            </div>
+            <button className="evaluate" disabled={citePayIsSubmitting} onClick={runCitePayFlow} type="button">
+              {citePayIsSubmitting ? "Evaluating sources..." : "Select paid sources and evaluate Guard"}
+            </button>
+            {citePayError ? <p className="error">{citePayError}</p> : null}
+          </div>
+
+          <div className="panel">
+            <h3>Mock source catalog</h3>
+            <div className="source-list">
+              {citePayMockSources.map((source) => (
+                <article className="source-card" key={source.id}>
+                  <div>
+                    <strong>{source.title}</strong>
+                    <span>{source.creatorName}</span>
+                  </div>
+                  <p>{source.description}</p>
+                  <dl>
+                    <div>
+                      <dt>Price</dt>
+                      <dd>
+                        {source.price} {source.currency}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Recipient</dt>
+                      <dd>{source.recipient}</dd>
+                    </div>
+                  </dl>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="citepay-results">
+          <div className="panel">
+            <h3>Selected sources</h3>
+            <div className="totals">
+              <span>Proposed spend: {citePaySelection?.totalProposedSpend ?? "0"} USDC</span>
+              <span>Allowed spend: {totalAllowedSpend} USDC</span>
+            </div>
+            {citePaySelection?.selected.length ? (
+              <div className="source-list">
+                {citePaySelection.selected.map((selected) => {
+                  const evaluation = citePayEvaluations.find((item) => item.source.id === selected.source.id);
+                  return (
+                    <article className="source-card" key={selected.source.id}>
+                      <div className="decision-line compact">
+                        <strong>{selected.source.title}</strong>
+                        <span>{evaluation?.result.decision ?? "PENDING"}</span>
+                      </div>
+                      <p>{selected.paymentIntent.intent}</p>
+                      <dl>
+                        <div>
+                          <dt>Amount</dt>
+                          <dd>
+                            {selected.source.price} {selected.source.currency}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Audit ID</dt>
+                          <dd>{evaluation?.result.auditId ?? "not evaluated"}</dd>
+                        </div>
+                        <div>
+                          <dt>Matched rules</dt>
+                          <dd>{evaluation?.result.matchedRules.join(", ") ?? "not evaluated"}</dd>
+                        </div>
+                      </dl>
+                    </article>
+                  );
+                })}
+              </div>
+            ) : (
+              <p>No selected sources yet.</p>
+            )}
+          </div>
+
+          <div className="panel">
+            <h3>Skipped sources</h3>
+            {citePaySelection?.skipped.length ? (
+              <ul className="skipped-list">
+                {citePaySelection.skipped.map((skipped) => (
+                  <li key={skipped.source.id}>
+                    <strong>{skipped.source.title}</strong>
+                    <span>{skipped.reason}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No skipped sources yet.</p>
+            )}
+          </div>
         </div>
       </section>
 

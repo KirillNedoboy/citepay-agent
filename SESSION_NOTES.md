@@ -428,3 +428,252 @@ Captured. The four required PNG files exist under `screenshots/`.
 ### Next safe step
 
 Initialize or publish the GitHub repository, then use `docs/launch-post.md` and the captured screenshots for the builder proof / grant proof submission.
+
+## 2026-06-16 - Lepton/CitePay documentation pivot
+
+### Context
+
+Started a new Lepton Agents Hackathon branch from the existing AgentPay Guard project.
+
+Goal: pivot the narrative from a standalone preflight policy/audit proof into CitePay Agent, an AI paid-citation product where an agent selects paid creator/source content, evaluates each resulting payment intent through AgentPay Guard, and may later route allowed payments through x402 / Circle Gateway / Arc-compatible flows.
+
+### Repository audit
+
+- Current branch: `codex/lepton-citepay-docs`.
+- Base commit before branch creation: `437f89f Build AgentPay Guard MVP proof`.
+- Stack: Next.js 16, React 19, TypeScript, Vitest, ESLint, pnpm.
+- Existing app boundaries:
+  - `src/domain/payment-intent` validates and evaluates payment intents.
+  - `src/domain/policy` loads deterministic policy config and returns `ALLOW`, `REVIEW`, or `BLOCK`.
+  - `src/domain/audit` appends or reuses JSONL audit records by `idempotencyKey`.
+  - `src/app/api/payment-intents/evaluate` exposes the Guard evaluation API.
+  - `src/app/api/audit-log` exposes recent audit records.
+  - `src/app/page.tsx` and `src/app/demo-client.tsx` provide the local demo UI.
+- Existing data and examples:
+  - `data/policies.default.json`
+  - `data/audit-log.jsonl`
+  - `examples/scenario-allow-api.json`
+  - `examples/scenario-review-machine.json`
+  - `examples/scenario-block-risky.json`
+- Existing proof assets include grant/demo docs and four screenshots under `screenshots/`.
+
+### Files changed
+
+- Created `docs/lepton-citepay-brief.md`.
+- Created `docs/citepay-mvp-scope.md`.
+- Updated `STATE.md`.
+- Updated `TASKS.md`.
+- Appended this entry to `SESSION_NOTES.md`.
+
+### Boundary kept intact
+
+This documentation-only phase did not change source code, API contracts, policy rules, audit behavior, `README.md`, or `REQUIREMENTS.md`.
+
+CitePay Agent is documented as an additive use case on top of AgentPay Guard. It does not remove the existing Guard MVP functionality.
+
+### Do not start yet
+
+- live Circle Gateway integration;
+- real x402 buyer/seller payment;
+- wallet signing;
+- custody/private key handling;
+- DB/auth;
+- smart contracts.
+
+### Next safe step
+
+Add mock creator source cards and an agent-side paid source selection flow that produces payment intents for the existing Guard API.
+
+### Validation status
+
+Commands run after the documentation-only edit:
+
+- `pnpm test`: failed because `node_modules` is missing and `vitest` is not recognized.
+- `pnpm lint`: failed because `node_modules` is missing and `eslint` is not recognized.
+- `pnpm typecheck`: failed because `node_modules` is missing and `tsc` is not recognized.
+- `pnpm build`: failed because `node_modules` is missing and `next` is not recognized.
+
+No `pnpm install` was run.
+
+## 2026-06-17 - CitePay local MVP code slice
+
+### Context
+
+Implemented the first local CitePay MVP code slice on top of the existing AgentPay Guard app.
+
+Goal: add mock paid creator/source cards and a deterministic agent-side selector that turns selected sources into payment intents compatible with the existing Guard API.
+
+### Files changed
+
+- Created `src/domain/citepay/types.ts`.
+- Created `src/domain/citepay/source-selection.ts`.
+- Created `tests/citepay-selection.test.ts`.
+- Updated `src/app/demo-client.tsx`.
+- Updated `src/app/globals.css`.
+- Updated `docs/citepay-mvp-scope.md`.
+- Updated `STATE.md`.
+- Updated `TASKS.md`.
+- Appended this entry to `SESSION_NOTES.md`.
+
+### What changed
+
+- Added strongly typed `CitePaySourceCard`, selection result, selected source, and skipped source types.
+- Added deterministic mock source cards for local paid-citation examples.
+- Added deterministic query relevance scoring from source tags.
+- Added decimal-string budget cap selection using existing decimal helpers.
+- Added payment-intent mapping to the existing `PaymentIntent` schema.
+- Added UI controls for user question, budget cap, source catalog, selected sources, skipped sources, Guard decisions, proposed spend, and allowed spend.
+- Kept all selected source evaluations on the existing `POST /api/payment-intents/evaluate` path.
+
+### Boundary kept intact
+
+- No real payments.
+- No wallet signing.
+- No live Circle/x402/Arc integration.
+- No secrets, env vars, database/auth, smart contracts, or external services.
+- No changes to `README.md` or `REQUIREMENTS.md`.
+- Existing AgentPay Guard API, policy engine, scenarios, and audit behavior remain in place.
+
+### TDD notes
+
+- Added `tests/citepay-selection.test.ts` first.
+- Verified RED with `pnpm test tests/citepay-selection.test.ts`; it failed because `@/domain/citepay/source-selection` did not exist.
+- Implemented the CitePay domain module.
+- Verified GREEN with `pnpm test tests/citepay-selection.test.ts`; 4 tests passed.
+
+### Validation status
+
+Commands run after implementation:
+
+- `pnpm test`: passed, 4 test files and 23 tests.
+- `pnpm lint`: passed.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+
+### Next safe step
+
+Capture updated CitePay demo screenshots and update the demo script to include the local paid-source selection flow.
+
+## 2026-06-17 - Lepton/CitePay demo preset and local script
+
+### Context
+
+Added a deterministic Lepton/CitePay demo preset so the local UI can demonstrate the paid-source flow without the viewer inventing a query.
+
+Goal: make the CitePay flow understandable in under 3 minutes while keeping all payment behavior local, mocked, and guarded by the existing AgentPay Guard evaluation API.
+
+### Files changed
+
+- Updated `src/domain/citepay/source-selection.ts`.
+- Updated `tests/citepay-selection.test.ts`.
+- Updated `src/app/demo-client.tsx`.
+- Updated `src/app/globals.css`.
+- Created `docs/citepay-demo-script.md`.
+- Updated `docs/citepay-mvp-scope.md`.
+- Updated `STATE.md`.
+- Updated `TASKS.md`.
+- Appended this entry to `SESSION_NOTES.md`.
+
+### What changed
+
+- Added `citePayDemoPreset` with exact query:
+  - `Need weather risk, climate claims, telemetry attestation, and private scrape cache context for an insurance answer`
+- Added exact budget:
+  - `0.24 USDC`
+- Wired the local CitePay UI to default to the preset and expose a `Load preset` control.
+- Added a focused unit test that verifies the preset selects paid sources, skips a non-relevant source, and produces Guard outcomes across `ALLOW`, `REVIEW`, and `BLOCK`.
+- Added a local demo script documenting the command, click path, expected source cards, proposed spend, allowed spend, and intentionally omitted live-payment features.
+
+### Expected preset outcome
+
+- Selected:
+  - `Weather risk brief` -> `ALLOW`
+  - `Climate claims dataset` -> `REVIEW`
+  - `Blocked scrape cache` -> `BLOCK`
+  - `Telemetry attestation note` -> `REVIEW`
+- Skipped:
+  - `Market data note` -> `not_relevant`
+- Proposed spend:
+  - `0.24 USDC`
+- Allowed spend:
+  - `0.08 USDC`
+
+### Boundary kept intact
+
+- No real payments.
+- No wallet signing.
+- No live Circle/x402/Arc integration.
+- No secrets, env vars, database/auth, smart contracts, or external services.
+- No changes to `README.md` or `REQUIREMENTS.md`.
+- No staging or commit.
+
+### Validation status
+
+- RED check: `pnpm test tests/citepay-selection.test.ts` failed because `citePayDemoPreset` was not implemented yet.
+- GREEN check: `pnpm test tests/citepay-selection.test.ts` passed after adding the preset.
+- `pnpm test`: passed, 4 test files and 24 tests.
+- `pnpm lint`: passed.
+- `pnpm typecheck`: initially failed because editable UI state inferred literal preset types; fixed with explicit `string` state types.
+- `pnpm typecheck`: passed after the type fix.
+- `pnpm build`: passed.
+
+### Next safe step
+
+Run the local app and capture updated CitePay screenshots using the built-in preset.
+
+## 2026-06-17 - CitePay preset screenshot checkpoint
+
+### Context
+
+Prepared a screenshot checkpoint for the deterministic Lepton/CitePay local preset demo.
+
+The checkpoint uses the built-in preset query and budget, runs the local UI flow, and captures the visible source-selection and Guard-decision states.
+
+### `next-env.d.ts` decision
+
+- Initial `git diff -- next-env.d.ts`: no diff.
+- Running the local dev server later changed the generated route type import from `.next/types/routes.d.ts` to `.next/dev/types/routes.d.ts`.
+- That change was generated dev-server drift, not required for build or typecheck.
+- Reverted only `next-env.d.ts` back to the tracked `.next/types/routes.d.ts` import.
+
+### Screenshots created
+
+- `screenshots/05-citepay-preset-loaded.png`
+- `screenshots/06-citepay-guard-decisions.png`
+- `screenshots/07-citepay-spend-summary.png`
+
+### Capture details
+
+- Used the existing `screenshots/NN-description.png` proof-pack convention.
+- Captured the initial preset state with the preset label, budget, user question, and mock source catalog.
+- Captured the evaluated flow showing:
+  - `ALLOW`
+  - `REVIEW`
+  - `BLOCK`
+  - skipped source `not_relevant`
+  - proposed spend `0.24 USDC`
+  - allowed spend `0.08 USDC`
+- Restored `data/audit-log.jsonl` after the screenshot run so transient local evaluation records did not remain as source changes.
+
+### Boundary kept intact
+
+- No app features changed.
+- No real payments.
+- No wallet signing.
+- No live Circle/x402/Arc integration.
+- No secrets, env vars, database/auth, smart contracts, or external services.
+- No changes to `README.md` or `REQUIREMENTS.md`.
+- No staging or commit.
+
+### Validation status
+
+- Screenshot files were created and visually inspected.
+- Required validation commands were run after capture:
+  - `pnpm test`
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm build`
+
+### Next safe step
+
+Review the screenshot checkpoint against the proof-pack narrative before publication.

@@ -1,12 +1,14 @@
-# STATE.md — Project State
+# STATE.md - Project State
 
 ## Product
 
-AgentPay Guard — preflight policy and audit layer for AI-agent payments.
+AgentPay Guard - preflight policy and audit layer for AI-agent payments.
+
+New Lepton/CitePay direction: CitePay Agent builds on AgentPay Guard as an AI paid-citation product where an agent selects paid creator/source content, turns each selection into a payment intent, and evaluates it through the existing Guard API before any payment rail is used.
 
 ## Current phase
 
-`FINAL_PACKAGE_READY_GITHUB_PENDING`
+`LEPTON_CITEPAY_SCREENSHOT_CHECKPOINT_READY`
 
 ## Done
 
@@ -32,6 +34,16 @@ AgentPay Guard — preflight policy and audit layer for AI-agent payments.
 - Launch post prepared.
 - Repository hygiene verified.
 - Required screenshots captured.
+- Lepton/CitePay direction documented in `docs/lepton-citepay-brief.md`.
+- CitePay MVP scope documented in `docs/citepay-mvp-scope.md`.
+- Mock CitePay creator/source cards implemented in code.
+- Deterministic agent-side paid source selection implemented.
+- CitePay source selections map to existing Guard-compatible payment intents.
+- CitePay UI evaluates selected source intents through the existing Guard API.
+- Tests added for source relevance, budget caps, payment-intent mapping, and Guard REVIEW/BLOCK propagation.
+- Deterministic Lepton/CitePay demo preset added to the local UI.
+- CitePay local demo script added at `docs/citepay-demo-script.md`.
+- CitePay preset screenshots captured under `screenshots/`.
 
 ## Not done
 
@@ -43,15 +55,23 @@ The MVP evaluates payment intent before payment execution.
 
 It must not move real funds.
 
+The CitePay direction must not remove or weaken the existing AgentPay Guard MVP boundary. CitePay may prepare payment intents for evaluation, but it must not execute real payments.
+
 ## Target demo
 
 A local web demo where the user can run:
 
-1. API nanopayment → `ALLOW`.
-2. Machine-to-machine telemetry payment → `REVIEW`.
-3. Risky autonomous payment → `BLOCK`.
+1. API nanopayment -> `ALLOW`.
+2. Machine-to-machine telemetry payment -> `REVIEW`.
+3. Risky autonomous payment -> `BLOCK`.
 
 Each result must create an audit log record.
+
+## Next safe implementation phase
+
+Review the CitePay screenshot checkpoint and proof-pack docs before publication.
+
+This phase should remain local and deterministic. It should not add live payment execution, wallet signing, custody, private key handling, DB/auth, or smart contracts.
 
 ## Deadline target
 
@@ -66,3 +86,5 @@ Builder proof should be ready by 2026-05-31.
 | Weak demo | Ensure 3 scenarios are visible and audit log is generated. |
 | Missing visual proof | Capture actual screenshots before publishing; do not use placeholders. |
 | Codex context drift | Keep `AGENTS.md`, `STATE.md`, `SESSION_NOTES.md` updated. |
+| CitePay scope creep | Keep CitePay as source selection plus Guard evaluation until live payments are explicitly requested. |
+| Ecosystem overclaiming | Do not claim official Circle, Arc, x402, Lepton, grant, user, revenue, or traction status. |
