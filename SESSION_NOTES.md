@@ -677,3 +677,60 @@ The checkpoint uses the built-in preset query and budget, runs the local UI flow
 ### Next safe step
 
 Review the screenshot checkpoint against the proof-pack narrative before publication.
+
+## 2026-06-17 - CitePay public narrative update
+
+### Context
+
+Updated the public project narrative for the `codex/lepton-citepay-docs` branch.
+
+Goal: make the branch README read clearly as AgentPay Guard plus CitePay Agent, while keeping all payment and integration claims explicitly local-only and not implemented.
+
+### Files changed
+
+- `README.md`
+- `STATE.md`
+- `TASKS.md`
+- `SESSION_NOTES.md`
+
+### What changed
+
+- Added a `CitePay Agent / Lepton Branch` section near the top of `README.md`.
+- Kept the existing AgentPay Guard explanation intact.
+- Added the required local run commands:
+  - `pnpm install --frozen-lockfile`
+  - `pnpm test`
+  - `pnpm lint`
+  - `pnpm typecheck`
+  - `pnpm build`
+  - `pnpm dev`
+- Added the deterministic CitePay preset query and budget:
+  - `Need weather risk, climate claims, telemetry attestation, and private scrape cache context for an insurance answer`
+  - `0.24 USDC`
+- Added the CitePay demo explanation covering mock paid source cards, deterministic selection, Guard evaluation, `ALLOW` / `REVIEW` / `BLOCK`, and proposed spend versus allowed spend.
+- Added links to:
+  - `screenshots/05-citepay-preset-loaded.png`
+  - `screenshots/06-citepay-guard-decisions.png`
+  - `screenshots/07-citepay-spend-summary.png`
+- Added an explicit `Not implemented yet` list covering settlement, signing, live integrations, custody/private keys, DB/auth, smart contracts, and production compliance claims.
+- Updated `STATE.md` and `TASKS.md` so tracker files match the new public narrative.
+
+### Boundary kept intact
+
+- No source code changes.
+- No real payments.
+- No wallet signing.
+- No live Circle/x402/Arc integration.
+- No secrets, env vars, database/auth, smart contracts, or external services.
+- No grant, traction, partnership, or live-user claims.
+
+### Validation status
+
+Pending fresh verification:
+
+- `pnpm test`
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build`
+
+No staging or commit before those commands pass.

@@ -8,7 +8,7 @@ New Lepton/CitePay direction: CitePay Agent builds on AgentPay Guard as an AI pa
 
 ## Current phase
 
-`LEPTON_CITEPAY_SCREENSHOT_CHECKPOINT_READY`
+`LEPTON_CITEPAY_NARRATIVE_UPDATE_READY`
 
 ## Done
 
@@ -44,6 +44,8 @@ New Lepton/CitePay direction: CitePay Agent builds on AgentPay Guard as an AI pa
 - Deterministic Lepton/CitePay demo preset added to the local UI.
 - CitePay local demo script added at `docs/citepay-demo-script.md`.
 - CitePay preset screenshots captured under `screenshots/`.
+- Public README updated for the Lepton/CitePay branch narrative.
+- Project tracker docs aligned with the CitePay public narrative.
 
 ## Not done
 
@@ -69,7 +71,7 @@ Each result must create an audit log record.
 
 ## Next safe implementation phase
 
-Review the CitePay screenshot checkpoint and proof-pack docs before publication.
+Review the updated CitePay public narrative and screenshot-backed proof-pack docs before publication.
 
 This phase should remain local and deterministic. It should not add live payment execution, wallet signing, custody, private key handling, DB/auth, or smart contracts.
 

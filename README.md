@@ -4,6 +4,14 @@ AgentPay Guard is a preflight policy and audit layer for AI-agent payment intent
 
 It does not move funds. It evaluates payment intent before an AI agent proceeds to an x402 / Circle Gateway / Arc payment flow.
 
+## CitePay Agent / Lepton Branch
+
+This branch keeps AgentPay Guard as the existing policy and audit foundation and adds CitePay Agent as a local paid-source demo on top of the Guard API.
+
+CitePay Agent selects mock paid creator/source cards, converts each selected card into a normal AgentPay Guard payment intent, and evaluates those intents through the existing Guard decision path.
+
+This branch does not implement real payments, wallet signing, or live Circle Gateway / x402 / Arc integration.
+
 ## What It Is
 
 AgentPay Guard is a local TypeScript MVP that accepts a payment intent, validates it, applies deterministic policy rules, returns `ALLOW`, `REVIEW`, or `BLOCK`, and writes a JSONL audit record.
@@ -110,7 +118,11 @@ Payment intent
 ## Run Locally
 
 ```bash
-pnpm install
+pnpm install --frozen-lockfile
+pnpm test
+pnpm lint
+pnpm typecheck
+pnpm build
 pnpm dev
 ```
 
@@ -120,36 +132,59 @@ Open:
 http://localhost:3000
 ```
 
-## Run Tests
+## CitePay Local Demo
 
-```bash
-pnpm test
-pnpm lint
-pnpm typecheck
-pnpm build
+Deterministic preset:
+
+Query:
+
+```txt
+Need weather risk, climate claims, telemetry attestation, and private scrape cache context for an insurance answer
 ```
 
-Current verified test coverage includes policy decisions, money edge cases, unsupported currency, denylisted/unknown recipients, unknown scenarios, suspicious keywords, daily limit, velocity limit, idempotency, JSONL validity, and invalid API input safe failure.
+Budget:
 
-## MVP Limitations
+```txt
+0.24 USDC
+```
 
-AgentPay Guard is not:
+What the demo shows:
 
-- a payment rail;
-- a wallet;
-- a custody product;
-- AML/KYC software;
-- a fraud prevention guarantee;
-- an official Arc/Circle module;
-- a system that moves real funds.
+- mock paid creator/source cards;
+- deterministic selection;
+- payment intents evaluated by Guard;
+- `ALLOW` / `REVIEW` / `BLOCK`;
+- proposed spend vs allowed spend.
 
-The MVP does not include live Circle API calls, wallet signing, private keys, auth, database, smart contracts, or external services.
+Related local demo script:
+
+- [`docs/citepay-demo-script.md`](docs/citepay-demo-script.md)
+
+Screenshots:
+
+- [`screenshots/05-citepay-preset-loaded.png`](screenshots/05-citepay-preset-loaded.png)
+- [`screenshots/06-citepay-guard-decisions.png`](screenshots/06-citepay-guard-decisions.png)
+- [`screenshots/07-citepay-spend-summary.png`](screenshots/07-citepay-spend-summary.png)
+
+Current verified test coverage includes policy decisions, money edge cases, unsupported currency, denylisted/unknown recipients, unknown scenarios, suspicious keywords, daily limit, velocity limit, idempotency, JSONL validity, invalid API input safe failure, and CitePay deterministic source selection.
+
+## Not Implemented Yet
+
+- real payment settlement;
+- wallet signing;
+- live Circle Gateway / x402 / Arc integration;
+- custody / private key handling;
+- DB / auth;
+- smart contracts;
+- production fraud / AML / compliance claims.
+
+AgentPay Guard is still not a payment rail, wallet, custody product, fraud-prevention guarantee, or official Arc/Circle module.
 
 ## Roadmap
 
-Potential next steps after the proof pack:
+Potential next safe steps after this local branch demo:
 
-1. Capture final screenshots and publish the GitHub repository.
+1. Publish the GitHub repository and proof pack.
 2. Add a buyer-side adapter for a real x402 / Circle Gateway flow.
 3. Add an operator review queue for `REVIEW` decisions.
 4. Add policy editing and exportable audit reports.

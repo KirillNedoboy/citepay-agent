@@ -80,6 +80,8 @@
   - [x] `screenshots/05-citepay-preset-loaded.png`
   - [x] `screenshots/06-citepay-guard-decisions.png`
   - [x] `screenshots/07-citepay-spend-summary.png`
+- [x] Update the public README narrative for the Lepton/CitePay branch.
+- [x] Align `STATE.md`, `TASKS.md`, and `SESSION_NOTES.md` with the CitePay branch narrative.
 - [ ] Keep payment execution, signing, live integrations, DB/auth, and smart contracts out of scope.
 
 ## Do not start yet without explicit request
