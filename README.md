@@ -184,7 +184,7 @@ AgentPay Guard is still not a payment rail, wallet, custody product, fraud-preve
 
 Potential next safe steps after this local branch demo:
 
-1. Publish the GitHub repository and proof pack.
+1. Open a PR and publish the submission proof pack.
 2. Add a buyer-side adapter for a real x402 / Circle Gateway flow.
 3. Add an operator review queue for `REVIEW` decisions.
 4. Add policy editing and exportable audit reports.
@@ -193,7 +193,7 @@ Potential next safe steps after this local branch demo:
 
 Live payment integration is future work, not part of the current MVP.
 
-## Grant Relevance
+## Hackathon Relevance
 
 This proof shows a concrete builder need around autonomous USDC payments: before agents spend, developers need deterministic controls and auditability.
 
