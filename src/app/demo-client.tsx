@@ -199,11 +199,8 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
           <h1>AgentPay Guard</h1>
           <p className="hero-text">AI payment guardrail that allows, reviews, or blocks agent spend with visible audit proof.</p>
           <div className="hero-actions">
-            <button className="hero-cta" onClick={runPrimaryDemo} type="button">
+            <button className="hero-cta-primary" onClick={runPrimaryDemo} type="button">
               {citePayIsSubmitting ? "Running demo..." : "Run demo"}
-            </button>
-            <button className="hero-secondary" onClick={() => scrollToId("evidence") } type="button">
-              View proof
             </button>
           </div>
           <div className="hero-notes">
@@ -225,45 +222,55 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
         </aside>
       </section>
 
-      <section className="architecture-strip" aria-label="Architecture flow">
-        {architectureStages.map((stage) => (
-          <span key={stage}>{stage}</span>
-        ))}
-      </section>
+      <details className="architecture-strip" aria-label="Architecture flow">
+        <summary>How it fits in the stack</summary>
+        <div className="architecture-strip-grid">
+          {architectureStages.map((stage) => (
+            <span key={stage}>{stage}</span>
+          ))}
+        </div>
+      </details>
 
-      <section className="summary-strip" aria-label="Live summary">
-        <article className="summary-card accent">
-          <span className="summary-label">Proposed spend</span>
+      <section className="summary-strip-compact" aria-label="Live summary">
+        <div className="summary-pill">
+          <span>Proposed</span>
           <strong>{demoSummary.proposedSpend} USDC</strong>
-        </article>
-        <article className="summary-card positive">
-          <span className="summary-label">Allowed spend</span>
+        </div>
+        <div className="summary-pill positive">
+          <span>Allowed</span>
           <strong>{demoSummary.allowedSpend} USDC</strong>
-        </article>
-        <article className="summary-card warning">
-          <span className="summary-label">Needs review</span>
+        </div>
+        <div className="summary-pill warning">
+          <span>Review</span>
           <strong>{demoSummary.reviewCount}</strong>
-        </article>
-        <article className="summary-card danger">
-          <span className="summary-label">Blocked</span>
+        </div>
+        <div className="summary-pill danger">
+          <span>Blocked</span>
           <strong>{demoSummary.blockedCount}</strong>
-        </article>
+        </div>
       </section>
 
-      <section className="outcome-band" aria-label="Primary outcome">
-        <article className={`outcome-card ${primaryOutcome.decision.toLowerCase()}`}>
-          <span className="summary-label">Decision</span>
-          <strong>{primaryOutcome.decision}</strong>
-        </article>
-        <article className="outcome-card narrative">
-          <span className="summary-label">Because</span>
-          <p>{primaryOutcome.reason}</p>
-        </article>
-        <article className="outcome-card proof">
-          <span className="summary-label">Audit trace</span>
-          <strong className="mono-text">{primaryOutcome.auditId}</strong>
-        </article>
-      </section>
+      <article className={`proof-card ${primaryOutcome.decision.toLowerCase()}`} aria-label="Guard decision">
+        <div className="proof-card-head">
+          <span className="summary-label">Guard decision</span>
+          <span className={`status-chip large ${primaryOutcome.decision.toLowerCase()}`}>
+            {primaryOutcome.decision}
+          </span>
+        </div>
+        <p className="proof-reason">{primaryOutcome.reason}</p>
+        <dl className="proof-meta">
+          <div>
+            <dt>Audit trace</dt>
+            <dd className="mono-text">{primaryOutcome.auditId}</dd>
+          </div>
+          <div>
+            <dt>Matched rules</dt>
+            <dd className="rule-list-inline">
+              {latestRules.length ? latestRules.join(", ") : "Run the demo to populate proof."}
+            </dd>
+          </div>
+        </dl>
+      </article>
 
       <section className="story-section" id="main-demo">
         <div className="section-heading narrative-heading">
@@ -455,37 +462,27 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
           </button>
         </div>
 
-        <div className="evidence-grid">
-          <article className="panel evidence-card evidence-hero">
-            <h3>What just happened</h3>
-            <div className="proof-grid">
-              <div>
-                <dt>Decision</dt>
-                <dd>
-                  <span className={`status-chip ${primaryOutcome.decision.toLowerCase()}`}>{primaryOutcome.decision}</span>
-                </dd>
-              </div>
-              <div>
-                <dt>Audit trace</dt>
-                <dd className="mono-text">{primaryOutcome.auditId}</dd>
-              </div>
-              <div className="wide-proof-row">
-                <dt>Because</dt>
-                <dd>{primaryOutcome.reason}</dd>
-              </div>
-              <div className="wide-proof-row">
-                <dt>Matched rules</dt>
-                <dd className="rule-list-inline">{latestRules.length ? latestRules.join(", ") : "Run the demo or test a policy case to populate proof."}</dd>
-              </div>
+        <article className={`proof-card stacked ${primaryOutcome.decision.toLowerCase()}`}>
+          <div className="proof-card-head">
+            <span className="summary-label">Latest decision</span>
+            <span className={`status-chip large ${primaryOutcome.decision.toLowerCase()}`}>
+              {primaryOutcome.decision}
+            </span>
+          </div>
+          <p className="proof-reason">{primaryOutcome.reason}</p>
+          <dl className="proof-meta">
+            <div>
+              <dt>Audit trace</dt>
+              <dd className="mono-text">{primaryOutcome.auditId}</dd>
             </div>
-          </article>
-
-          <article className="panel evidence-card validator-callout">
-            <h3>Advanced checks</h3>
-            <p className="section-subtitle">Full audit history and policy test cases stay below as expandable secondary proof.</p>
-            <span className="mono-chip">Details stay out of the first tap path</span>
-          </article>
-        </div>
+            <div className="wide-proof-row">
+              <dt>Matched rules</dt>
+              <dd className="rule-list-inline">
+                {latestRules.length ? latestRules.join(", ") : "Run the demo to populate proof."}
+              </dd>
+            </div>
+          </dl>
+        </article>
 
         <details className="panel audit-panel collapse-block">
           <summary className="collapse-summary-strong">
