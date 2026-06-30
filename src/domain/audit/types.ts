@@ -1,17 +1,23 @@
-import type { CircleRailPreview, Decision } from "@/domain/payment-intent/types";
+import type { CircleRail, CircleRailPreview, Decision, PaymentPurpose } from "@/domain/payment-intent/types";
 
 export type AuditRecord = {
   eventType: "agent_payment_guard_evaluated";
   auditId: string;
   timestamp: string;
+  intentId?: string;
   idempotencyKey: string;
   agentId: string;
   intent: string;
   amount: string;
+  amountUSDC?: string;
   currency: string;
   recipient: string;
+  recipientId?: string;
+  recipientLabel?: string;
   scenario: string;
+  purpose?: PaymentPurpose;
   paymentRail: string;
+  rail?: CircleRail;
   decision: Decision;
   riskScore: number;
   policyId: string;

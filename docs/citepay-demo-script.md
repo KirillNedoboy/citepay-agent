@@ -1,6 +1,18 @@
 # CitePay Local Demo Script
 
-## Goal
+## Status
+
+Legacy reference only. This script documents the earlier Lepton/CitePay branch flow and is not the current Ignyte / Circle / Arc reviewer path.
+
+For the current demo, use:
+
+- `docs/demo-script.md`
+- `docs/ignyte-circle-arc-brief.md`
+- `README.md`
+
+The old values below, including `0.24 USDC`, `Weather risk brief`, `Climate claims dataset`, and `Blocked scrape cache`, are kept only as historical context for the earlier paid-citation experiment.
+
+## Legacy goal
 
 Show the deterministic Lepton/CitePay paid-citation flow in under 3 minutes without inventing a query.
 

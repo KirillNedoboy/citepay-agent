@@ -786,6 +786,31 @@ table td:nth-child(5) {
   overflow-x: auto;
 }
 
+.audit-json-block {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.audit-json-block h4 {
+  margin-bottom: 0;
+}
+
+.audit-json-block pre {
+  max-height: 340px;
+  overflow: auto;
+  margin: 0;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  padding: 14px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

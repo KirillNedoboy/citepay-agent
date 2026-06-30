@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { appendFile, mkdir, readFile } from "node:fs/promises";
 import { dirname } from "node:path";
-import { buildCircleRailPreview } from "@/domain/payment-intent/rail-preview";
+import { buildCircleRailPreview, mapScenarioToPaymentPurpose } from "@/domain/payment-intent/rail-preview";
 import type { PaymentIntent, PolicyDecision } from "@/domain/payment-intent/types";
 import type { AuditRecord } from "./types";
 
@@ -37,12 +37,41 @@ function parseAuditLines(content: string): AuditRecord[] {
   return content
     .split(/\r?\n/)
     .filter((line) => line.trim().length > 0)
-    .map((line) => JSON.parse(line) as AuditRecord);
+    .map((line) => normalizeAuditRecord(JSON.parse(line) as AuditRecord));
 }
 
 function makeAuditId(existingCount: number, timestamp: string): string {
   const date = timestamp.slice(0, 10).replaceAll("-", "");
   return `audit_${date}_${String(existingCount + 1).padStart(6, "0")}`;
+}
+
+function normalizeAuditRecord(record: AuditRecord): AuditRecord {
+  const railPreview =
+    record.railPreview ??
+    buildCircleRailPreview({
+      agentId: record.agentId,
+      intent: record.intent,
+      amount: record.amount,
+      currency: record.currency,
+      recipient: record.recipient,
+      scenario: record.scenario,
+      paymentRail: record.paymentRail,
+      idempotencyKey: record.idempotencyKey
+    });
+
+  return {
+    ...record,
+    eventType: record.eventType ?? "agent_payment_guard_evaluated",
+    intentId: record.intentId ?? record.idempotencyKey,
+    amountUSDC: record.amountUSDC ?? record.amount,
+    recipientId: record.recipientId ?? record.recipient,
+    recipientLabel: record.recipientLabel ?? record.recipient,
+    purpose: record.purpose ?? mapScenarioToPaymentPurpose(record.scenario),
+    rail: record.rail ?? railPreview.rail,
+    reasonCodes: record.reasonCodes ?? [],
+    executionMode: record.executionMode ?? railPreview.executionMode,
+    railPreview
+  };
 }
 
 export async function createOrReuseAuditRecord(
@@ -65,14 +94,20 @@ export async function createOrReuseAuditRecord(
       eventType: "agent_payment_guard_evaluated",
       auditId: makeAuditId(records.length, timestamp),
       timestamp,
+      intentId: intent.idempotencyKey,
       idempotencyKey: intent.idempotencyKey,
       agentId: intent.agentId,
       intent: intent.intent,
       amount: intent.amount,
+      amountUSDC: intent.amount,
       currency: intent.currency,
       recipient: intent.recipient,
+      recipientId: intent.recipient,
+      recipientLabel: intent.recipient,
       scenario: intent.scenario,
+      purpose: mapScenarioToPaymentPurpose(intent.scenario),
       paymentRail: intent.paymentRail,
+      rail: railPreview.rail,
       decision: decision.decision,
       riskScore: decision.riskScore,
       policyId: decision.policyId,

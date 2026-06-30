@@ -1,4 +1,4 @@
-import type { CircleRail, CircleRailPreview, PaymentIntent } from "./types";
+import type { CircleRail, CircleRailPreview, PaymentIntent, PaymentPurpose } from "./types";
 
 const previewOnlyExplanation =
   "Preview only. AgentPay Guard has not moved funds, signed a transaction, or called a live payment rail.";
@@ -24,6 +24,22 @@ function normalizeRail(paymentRail: string): CircleRail {
     return "mock_agent_wallet";
   }
   return "mock_agent_wallet";
+}
+
+export function mapScenarioToPaymentPurpose(scenario: string): PaymentPurpose {
+  if (scenario === "api_access") {
+    return "api_data_purchase";
+  }
+  if (scenario === "data_access") {
+    return "premium_research_source";
+  }
+  if (scenario === "machine_to_machine") {
+    return "verification_or_attestation";
+  }
+  if (scenario === "compute_access") {
+    return "agent_to_agent_service";
+  }
+  return "unknown";
 }
 
 export function buildCircleRailPreview(intent: PaymentIntent): CircleRailPreview {

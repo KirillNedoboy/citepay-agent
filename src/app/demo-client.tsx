@@ -9,7 +9,7 @@ import {
 import type { CitePaySelectedSource, CitePaySelectionResult } from "@/domain/citepay/types";
 import type { AuditRecord } from "@/domain/audit/types";
 import type { CircleRailPreview, PaymentIntent } from "@/domain/payment-intent/types";
-import { buildDemoSummary, buildRailPreviewRows } from "./demo-metrics";
+import { buildAuditPreview, buildDemoSummary, buildRailPreviewRows, buildReasonCodeRows } from "./demo-metrics";
 
 export type Scenario = {
   label: string;
@@ -23,6 +23,7 @@ type EvaluationResult = {
   riskScore: number;
   reason: string;
   matchedRules: string[];
+  reasonCodes?: string[];
   policyId: string;
   auditId: string | null;
   createdAt: string;
@@ -162,6 +163,21 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
     }
     return Array.from(unique);
   }, [citePayEvaluations, result]);
+  const latestReasonCodes = useMemo(() => {
+    const unique = new Set<string>();
+    for (const evaluation of citePayEvaluations) {
+      for (const code of evaluation.result.reasonCodes ?? []) {
+        unique.add(code);
+      }
+    }
+    if (result) {
+      for (const code of result.reasonCodes ?? []) {
+        unique.add(code);
+      }
+    }
+    return Array.from(unique);
+  }, [citePayEvaluations, result]);
+  const auditPreview = useMemo(() => buildAuditPreview(records[0]), [records]);
   const primaryOutcome = useMemo(() => {
     const rankedEvaluation =
       citePayEvaluations.find((item) => item.result.decision === "BLOCK") ??
@@ -219,6 +235,20 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
         <p className="rail-preview-boundary">No funds move in mock mode.</p>
       </div>
     );
+  }
+
+  function renderReasonCodes(reasonCodes: string[] | undefined) {
+    const rows = buildReasonCodeRows(reasonCodes);
+    if (!rows.length) {
+      return null;
+    }
+
+    return rows.map(([label, value]) => (
+      <div className="wide-proof-row" key={label}>
+        <dt>{label}</dt>
+        <dd className="rule-list-inline">{value}</dd>
+      </div>
+    ));
   }
 
   return (
@@ -297,6 +327,12 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
             <dt>Matched rules</dt>
             <dd className="rule-list-inline">
               {latestRules.length ? latestRules.join(", ") : "Run the demo to populate proof."}
+            </dd>
+          </div>
+          <div>
+            <dt>Reason codes</dt>
+            <dd className="rule-list-inline">
+              {latestReasonCodes.length ? latestReasonCodes.join(", ") : "Run the demo to populate evidence codes."}
             </dd>
           </div>
         </dl>
@@ -467,6 +503,7 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
                         <dt>Matched rules</dt>
                         <dd className="rule-list-inline">{evaluation.result.matchedRules.join(", ")}</dd>
                       </div>
+                      {renderReasonCodes(evaluation.result.reasonCodes)}
                     </dl>
                     {renderRailPreview(evaluation.result.railPreview)}
                   </article>
@@ -510,6 +547,12 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
               <dt>Matched rules</dt>
               <dd className="rule-list-inline">
                 {latestRules.length ? latestRules.join(", ") : "Run the demo to populate proof."}
+              </dd>
+            </div>
+            <div className="wide-proof-row">
+              <dt>Reason codes</dt>
+              <dd className="rule-list-inline">
+                {latestReasonCodes.length ? latestReasonCodes.join(", ") : "Run the demo to populate evidence codes."}
               </dd>
             </div>
           </dl>
@@ -562,6 +605,12 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
                 </tbody>
               </table>
             </div>
+            {auditPreview ? (
+              <div className="audit-json-block">
+                <h4>Structured audit preview</h4>
+                <pre>{JSON.stringify(auditPreview, null, 2)}</pre>
+              </div>
+            ) : null}
           </div>
         </details>
       </section>
@@ -636,6 +685,14 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
                     {result.matchedRules.map((rule) => (
                       <li className="mono-text" key={rule}>
                         {rule}
+                      </li>
+                    ))}
+                  </ul>
+                  <h4>Reason codes</h4>
+                  <ul className="rule-list">
+                    {(result.reasonCodes ?? []).map((code) => (
+                      <li className="mono-text" key={code}>
+                        {code}
                       </li>
                     ))}
                   </ul>

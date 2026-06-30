@@ -15,14 +15,20 @@ Each line is a complete JSON object. The file is append-only, except that a repe
   "eventType": "agent_payment_guard_evaluated",
   "auditId": "audit_20260629_000001",
   "timestamp": "2026-06-29T12:00:00.000Z",
+  "intentId": "ignyte-allow-x402",
   "idempotencyKey": "ignyte-allow-x402",
   "agentId": "agent_ignyte_demo_001",
   "intent": "Buy premium verification data for a research task",
   "amount": "0.08",
+  "amountUSDC": "0.08",
   "currency": "USDC",
   "recipient": "trusted-x402-api.demo",
+  "recipientId": "trusted-x402-api.demo",
+  "recipientLabel": "trusted-x402-api.demo",
   "scenario": "api_access",
+  "purpose": "api_data_purchase",
   "paymentRail": "mock_x402_service",
+  "rail": "mock_x402_service",
   "decision": "ALLOW",
   "riskScore": 10,
   "policyId": "default-agentpay-policy-v1",
@@ -56,20 +62,40 @@ Each line is a complete JSON object. The file is append-only, except that a repe
 - `eventType`
 - `auditId`
 - `timestamp`
+- `intentId`
 - `idempotencyKey`
 - `agentId`
 - `intent`
 - `amount`
+- `amountUSDC`
 - `currency`
 - `recipient`
+- `recipientId`
+- `recipientLabel`
 - `scenario`
+- `purpose`
 - `paymentRail`
+- `rail`
 - `decision`
 - `riskScore`
 - `policyId`
 - `matchedRules`
 - `reasonCodes`
 - `reason`
+- `executionMode`
+- `railPreview`
+
+## Structured audit preview
+
+The UI renders a copyable structured audit preview for the most recent audit record. It uses the stored fields directly when present and falls back to the legacy fields for older JSONL lines:
+
+- `intentId` from `intentId` or `idempotencyKey`
+- `recipientLabel` from `recipientLabel` or `recipient`
+- `amountUSDC` from `amountUSDC` or `amount`
+- `purpose` from `purpose` or deterministic scenario mapping
+- `rail` from `rail` or `railPreview.rail`
+- `decision`
+- `reasonCodes`
 - `executionMode`
 - `railPreview`
 

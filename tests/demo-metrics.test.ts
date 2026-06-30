@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { buildDemoSummary, buildRailPreviewRows } from "@/app/demo-metrics";
+import { buildAuditPreview, buildDemoSummary, buildRailPreviewRows, buildReasonCodeRows } from "@/app/demo-metrics";
+import type { AuditRecord } from "@/domain/audit/types";
 
 describe("buildDemoSummary", () => {
   test("returns zeroed summary before any selection or evaluations", () => {
@@ -61,5 +62,112 @@ describe("buildRailPreviewRows", () => {
 
   test("returns no rows when the API response has no rail preview", () => {
     expect(buildRailPreviewRows(undefined)).toEqual([]);
+  });
+});
+
+describe("buildReasonCodeRows", () => {
+  test("returns explicit reason code rows for policy evidence", () => {
+    expect(buildReasonCodeRows(["RECIPIENT_TRUSTED", "AMOUNT_WITHIN_LIMIT", "RAIL_PREVIEW_ONLY"])).toEqual([
+      ["Reason codes", "RECIPIENT_TRUSTED, AMOUNT_WITHIN_LIMIT, RAIL_PREVIEW_ONLY"]
+    ]);
+  });
+
+  test("returns no rows when reason codes are absent", () => {
+    expect(buildReasonCodeRows(undefined)).toEqual([]);
+  });
+});
+
+describe("buildAuditPreview", () => {
+  test("maps the existing audit record shape to TZ-relevant structured preview fields", () => {
+    const preview = buildAuditPreview({
+      eventType: "agent_payment_guard_evaluated",
+      auditId: "audit_20260630_000001",
+      timestamp: "2026-06-30T06:00:00.000Z",
+      idempotencyKey: "ignyte-review-premium-dataset-001",
+      agentId: "agent_ignyte_demo_001",
+      intent: "Buy high-value premium evidence bundle before publishing an agent-generated thesis",
+      amount: "0.25",
+      currency: "USDC",
+      recipient: "premium-evidence-bundle.demo",
+      scenario: "data_access",
+      paymentRail: "mock_gateway_nanopayment",
+      decision: "REVIEW",
+      riskScore: 60,
+      policyId: "default-agentpay-policy-v1",
+      matchedRules: ["recipient_requires_review"],
+      reasonCodes: ["RECIPIENT_REVIEW_REQUIRED", "AMOUNT_EXCEEDS_REVIEW_THRESHOLD", "RAIL_PREVIEW_ONLY"],
+      reason: "Recipient requires operator review.",
+      executionMode: "mock_preview",
+      railPreview: {
+        rail: "mock_gateway_nanopayment",
+        networkLabel: "Circle Gateway Nanopayment preview",
+        settlementAsset: "USDC",
+        executionMode: "mock_preview",
+        recipientId: "premium-evidence-bundle.demo",
+        amountUSDC: "0.25",
+        explanation: "Preview only. AgentPay Guard has not moved funds, signed a transaction, or called a live payment rail."
+      }
+    });
+
+    expect(preview).toEqual({
+      intentId: "ignyte-review-premium-dataset-001",
+      recipientLabel: "premium-evidence-bundle.demo",
+      amountUSDC: "0.25",
+      purpose: "premium_research_source",
+      rail: "mock_gateway_nanopayment",
+      decision: "REVIEW",
+      reasonCodes: ["RECIPIENT_REVIEW_REQUIRED", "AMOUNT_EXCEEDS_REVIEW_THRESHOLD", "RAIL_PREVIEW_ONLY"],
+      executionMode: "mock_preview",
+      railPreview: {
+        rail: "mock_gateway_nanopayment",
+        networkLabel: "Circle Gateway Nanopayment preview",
+        settlementAsset: "USDC",
+        executionMode: "mock_preview",
+        recipientId: "premium-evidence-bundle.demo",
+        amountUSDC: "0.25",
+        explanation: "Preview only. AgentPay Guard has not moved funds, signed a transaction, or called a live payment rail."
+      }
+    });
+    expect(JSON.stringify(preview)).not.toMatch(/transactionHash|txHash|signature|privateKey|seedPhrase/i);
+  });
+
+  test("returns null when there is no recent audit record", () => {
+    expect(buildAuditPreview(undefined)).toBeNull();
+  });
+
+  test("maps legacy audit records that do not yet store rail preview fields", () => {
+    const preview = buildAuditPreview({
+      auditId: "audit_20260527_000001",
+      timestamp: "2026-05-27T20:25:26.560Z",
+      idempotencyKey: "legacy-demo-allow",
+      agentId: "agent_market_data_001",
+      intent: "Pay $0.005 USDC for market data API access",
+      amount: "0.005",
+      currency: "USDC",
+      recipient: "market-data-api.demo",
+      scenario: "api_access",
+      paymentRail: "x402_gateway_nanopayment",
+      decision: "ALLOW",
+      riskScore: 10,
+      policyId: "default-agentpay-policy-v1",
+      matchedRules: ["recipient_allowlisted"],
+      reason: "Recipient is allowlisted."
+    } as AuditRecord);
+
+    expect(preview).toMatchObject({
+      intentId: "legacy-demo-allow",
+      recipientLabel: "market-data-api.demo",
+      amountUSDC: "0.005",
+      purpose: "api_data_purchase",
+      rail: "mock_x402_service",
+      decision: "ALLOW",
+      reasonCodes: [],
+      executionMode: "mock_preview",
+      railPreview: {
+        rail: "mock_x402_service",
+        amountUSDC: "0.005",
+        recipientId: "market-data-api.demo"
+      }
+    });
   });
 });

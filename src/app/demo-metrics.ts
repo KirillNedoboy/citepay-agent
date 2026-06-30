@@ -1,4 +1,6 @@
 import type { CitePaySelectedSource, CitePaySelectionResult } from "@/domain/citepay/types";
+import type { AuditRecord } from "@/domain/audit/types";
+import { buildCircleRailPreview, mapScenarioToPaymentPurpose } from "@/domain/payment-intent/rail-preview";
 import type { CircleRailPreview } from "@/domain/payment-intent/types";
 import { addDecimalStrings } from "@/lib/decimal";
 
@@ -21,6 +23,18 @@ export type DemoSummary = {
 };
 
 export type RailPreviewRow = [label: string, value: string];
+export type ReasonCodeRow = [label: "Reason codes", value: string];
+export type StructuredAuditPreview = {
+  intentId: string;
+  recipientLabel: string;
+  amountUSDC: string;
+  purpose: string;
+  rail: string;
+  decision: string;
+  reasonCodes: string[];
+  executionMode: string;
+  railPreview: CircleRailPreview;
+};
 
 export function buildDemoSummary(
   selection: CitePaySelectionResult | null,
@@ -54,4 +68,43 @@ export function buildRailPreviewRows(preview: CircleRailPreview | undefined): Ra
     ["Recipient", preview.recipientId],
     ["Amount", `${preview.amountUSDC} ${preview.settlementAsset}`]
   ];
+}
+
+export function buildReasonCodeRows(reasonCodes: string[] | undefined): ReasonCodeRow[] {
+  if (!reasonCodes?.length) {
+    return [];
+  }
+
+  return [["Reason codes", reasonCodes.join(", ")]];
+}
+
+export function buildAuditPreview(record: AuditRecord | undefined): StructuredAuditPreview | null {
+  if (!record) {
+    return null;
+  }
+
+  const railPreview =
+    record.railPreview ??
+    buildCircleRailPreview({
+      agentId: record.agentId,
+      intent: record.intent,
+      amount: record.amount,
+      currency: record.currency,
+      recipient: record.recipient,
+      scenario: record.scenario,
+      paymentRail: record.paymentRail,
+      idempotencyKey: record.idempotencyKey
+    });
+
+  return {
+    intentId: record.intentId ?? record.idempotencyKey,
+    recipientLabel: record.recipientLabel ?? record.recipient,
+    amountUSDC: record.amountUSDC ?? record.amount,
+    purpose: record.purpose ?? mapScenarioToPaymentPurpose(record.scenario),
+    rail: record.rail ?? railPreview.rail,
+    decision: record.decision,
+    reasonCodes: record.reasonCodes ?? [],
+    executionMode: record.executionMode ?? railPreview.executionMode,
+    railPreview
+  };
 }
