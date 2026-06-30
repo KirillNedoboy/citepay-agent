@@ -548,6 +548,65 @@ input:focus {
   margin-bottom: 0;
 }
 
+.rail-preview {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 12px;
+}
+
+.rail-preview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rail-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rail-preview p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.rail-preview-boundary {
+  color: var(--text) !important;
+  font-weight: 800;
+}
+
+.execution-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-strong);
+  background: var(--panel-soft);
+  color: var(--text);
+  padding: 5px 8px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.execution-chip.mock_preview {
+  border-color: rgba(15, 118, 110, 0.3);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.execution-chip.live_disabled {
+  border-color: rgba(180, 35, 24, 0.26);
+  background: var(--block-soft);
+  color: var(--block);
+}
+
 .empty-state {
   display: grid;
   gap: 8px;
@@ -1089,7 +1148,8 @@ th {
   .scenario-grid,
   .form-grid,
   .totals,
-  .meta-grid {
+  .meta-grid,
+  .rail-preview-grid {
     grid-template-columns: 1fr;
   }
 

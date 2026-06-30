@@ -8,6 +8,7 @@ export type PolicyConfig = {
   limits: {
     maxAmountPerPayment: string;
     dailyLimitPerAgent: string;
+    reviewThreshold: string;
   };
   velocity: {
     windowSeconds: number;
@@ -25,6 +26,7 @@ export type PolicyConfig = {
     suspiciousKeyword: number;
     velocityExceeded: number;
     amountAboveHalfLimit: number;
+    amountAboveReviewThreshold: number;
   };
   decisionThresholds: {
     reviewAt: number;

@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { appendFile, mkdir, readFile } from "node:fs/promises";
 import { dirname } from "node:path";
+import { buildCircleRailPreview } from "@/domain/payment-intent/rail-preview";
 import type { PaymentIntent, PolicyDecision } from "@/domain/payment-intent/types";
 import type { AuditRecord } from "./types";
 
@@ -59,7 +60,9 @@ export async function createOrReuseAuditRecord(
     }
 
     const timestamp = new Date().toISOString();
+    const railPreview = buildCircleRailPreview(intent);
     const record: AuditRecord = {
+      eventType: "agent_payment_guard_evaluated",
       auditId: makeAuditId(records.length, timestamp),
       timestamp,
       idempotencyKey: intent.idempotencyKey,
@@ -74,7 +77,10 @@ export async function createOrReuseAuditRecord(
       riskScore: decision.riskScore,
       policyId: decision.policyId,
       matchedRules: decision.matchedRules,
-      reason: decision.reason
+      reasonCodes: decision.reasonCodes,
+      reason: decision.reason,
+      executionMode: railPreview.executionMode,
+      railPreview
     };
 
     await appendFile(auditPath, `${JSON.stringify(record)}\n`, "utf8");

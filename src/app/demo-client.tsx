@@ -8,8 +8,8 @@ import {
 } from "@/domain/citepay/source-selection";
 import type { CitePaySelectedSource, CitePaySelectionResult } from "@/domain/citepay/types";
 import type { AuditRecord } from "@/domain/audit/types";
-import type { PaymentIntent } from "@/domain/payment-intent/types";
-import { buildDemoSummary } from "./demo-metrics";
+import type { CircleRailPreview, PaymentIntent } from "@/domain/payment-intent/types";
+import { buildDemoSummary, buildRailPreviewRows } from "./demo-metrics";
 
 export type Scenario = {
   label: string;
@@ -26,6 +26,8 @@ type EvaluationResult = {
   policyId: string;
   auditId: string | null;
   createdAt: string;
+  executionMode?: CircleRailPreview["executionMode"];
+  railPreview?: CircleRailPreview;
 };
 
 type FieldName = keyof PaymentIntent;
@@ -189,6 +191,34 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
   function runPrimaryDemo() {
     scrollToId("main-demo");
     void runCitePayFlow();
+  }
+
+  function renderRailPreview(preview: CircleRailPreview | undefined) {
+    const rows = buildRailPreviewRows(preview);
+    if (!rows.length) {
+      return null;
+    }
+
+    return (
+      <div className="rail-preview" aria-label="Circle and Arc rail preview">
+        <div className="rail-preview-head">
+          <strong>Rail preview</strong>
+          <span className={`execution-chip ${preview?.executionMode ?? "live_disabled"}`}>
+            {preview?.executionMode ?? "live_disabled"}
+          </span>
+        </div>
+        <dl className="rail-preview-grid">
+          {rows.map(([label, value]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd className={label === "Mode" || label === "Recipient" ? "mono-text" : ""}>{value}</dd>
+            </div>
+          ))}
+        </dl>
+        <p>{preview?.explanation ?? "Live payment rail is disabled. This response is a preview, not settlement."}</p>
+        <p className="rail-preview-boundary">No funds move in mock mode.</p>
+      </div>
+    );
   }
 
   return (
@@ -438,6 +468,7 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
                         <dd className="rule-list-inline">{evaluation.result.matchedRules.join(", ")}</dd>
                       </div>
                     </dl>
+                    {renderRailPreview(evaluation.result.railPreview)}
                   </article>
                 ))}
               </div>
@@ -608,6 +639,7 @@ export default function DemoClient({ scenarios }: { scenarios: Scenario[] }) {
                       </li>
                     ))}
                   </ul>
+                  {renderRailPreview(result.railPreview)}
                 </>
               ) : (
                 <div className="empty-state emphasis">

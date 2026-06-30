@@ -3,9 +3,9 @@ import { join } from "node:path";
 import DemoClient, { type Scenario } from "./demo-client";
 
 const scenarioFiles = [
-  ["API nanopayment", "scenario-allow-api.json"],
-  ["Machine-to-machine payment", "scenario-review-machine.json"],
-  ["Risky autonomous spend", "scenario-block-risky.json"]
+  ["Trusted x402 API purchase", "scenario-allow-api.json"],
+  ["Premium dataset review", "scenario-review-machine.json"],
+  ["Untrusted source block", "scenario-block-risky.json"]
 ] as const;
 
 function loadScenarios(): Scenario[] {

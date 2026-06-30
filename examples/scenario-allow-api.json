@@ -1,11 +1,11 @@
 {
-  "agentId": "agent_market_data_001",
-  "intent": "Pay $0.005 USDC for market data API access",
-  "amount": "0.005",
+  "agentId": "agent_ignyte_demo_001",
+  "intent": "Buy premium verification data from a trusted x402 API for an agent research task",
+  "amount": "0.08",
   "currency": "USDC",
-  "recipient": "market-data-api.demo",
+  "recipient": "trusted-x402-api.demo",
   "scenario": "api_access",
-  "paymentRail": "x402_gateway_nanopayment",
-  "idempotencyKey": "demo-allow-api-001",
+  "paymentRail": "mock_x402_service",
+  "idempotencyKey": "ignyte-allow-x402-api-001",
   "expectedDecision": "ALLOW"
 }

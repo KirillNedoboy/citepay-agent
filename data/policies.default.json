@@ -7,7 +7,8 @@
   },
   "limits": {
     "maxAmountPerPayment": "10.00",
-    "dailyLimitPerAgent": "25.00"
+    "dailyLimitPerAgent": "25.00",
+    "reviewThreshold": "0.20"
   },
   "velocity": {
     "windowSeconds": 60,
@@ -22,10 +23,12 @@
   "allowlistedRecipients": [
     "market-data-api.demo",
     "weather-api.demo",
-    "compute-provider.demo"
+    "compute-provider.demo",
+    "trusted-x402-api.demo"
   ],
   "reviewRecipients": [
-    "telemetry-attestation.demo"
+    "telemetry-attestation.demo",
+    "premium-evidence-bundle.demo"
   ],
   "deniedRecipients": [
     "blocked-recipient.demo",
@@ -46,7 +49,8 @@
     "reviewRecipient": 25,
     "suspiciousKeyword": 30,
     "velocityExceeded": 30,
-    "amountAboveHalfLimit": 20
+    "amountAboveHalfLimit": 20,
+    "amountAboveReviewThreshold": 25
   },
   "decisionThresholds": {
     "reviewAt": 30,

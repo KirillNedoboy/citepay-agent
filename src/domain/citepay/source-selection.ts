@@ -10,28 +10,28 @@ import type {
 
 export const citePayMockSources: CitePaySourceCard[] = [
   {
-    id: "weather-risk-brief",
-    title: "Weather risk brief",
-    creatorName: "Weather Desk",
-    recipient: "weather-api.demo",
-    description: "Premium weather risk source for climate, insurance, and regional hazard answers.",
+    id: "trusted-x402-verification-api",
+    title: "Trusted x402 verification API",
+    creatorName: "Verity API",
+    recipient: "trusted-x402-api.demo",
+    description: "Trusted paid API for premium verification data before an agent publishes a research thesis.",
     price: "0.08",
     currency: "USDC",
-    scenario: "data_access",
-    paymentRail: "future_x402_gateway_citation_payment",
-    tags: ["weather", "risk", "climate", "insurance", "data"]
+    scenario: "api_access",
+    paymentRail: "mock_x402_service",
+    tags: ["premium", "verification", "data", "agent", "research", "thesis"]
   },
   {
-    id: "climate-claims-dataset",
-    title: "Climate claims dataset",
-    creatorName: "Creator Lab",
-    recipient: "creator-lab.demo",
-    description: "Creator-owned dataset for insurance claims and climate exposure analysis.",
-    price: "0.09",
+    id: "premium-evidence-bundle",
+    title: "Premium evidence bundle",
+    creatorName: "Evidence Vault",
+    recipient: "premium-evidence-bundle.demo",
+    description: "Higher-value source bundle that should pause autonomous USDC spend for operator review.",
+    price: "0.25",
     currency: "USDC",
     scenario: "data_access",
-    paymentRail: "future_x402_gateway_citation_payment",
-    tags: ["climate", "claims", "insurance", "data"]
+    paymentRail: "mock_gateway_nanopayment",
+    tags: ["premium", "evidence", "bundle", "source"]
   },
   {
     id: "market-data-note",
@@ -46,6 +46,18 @@ export const citePayMockSources: CitePaySourceCard[] = [
     tags: ["market", "pricing", "trading"]
   },
   {
+    id: "untrusted-scrape-cache",
+    title: "Untrusted scrape cache",
+    creatorName: "Blocked Source",
+    recipient: "blocked-recipient.demo",
+    description: "Denied source example for scraped or unverified cache content.",
+    price: "0.04",
+    currency: "USDC",
+    scenario: "data_access",
+    paymentRail: "arc_settlement_preview",
+    tags: ["scraped", "cache"]
+  },
+  {
     id: "telemetry-attestation-note",
     title: "Telemetry attestation note",
     creatorName: "Telemetry Attestation",
@@ -54,28 +66,16 @@ export const citePayMockSources: CitePaySourceCard[] = [
     price: "0.03",
     currency: "USDC",
     scenario: "machine_to_machine",
-    paymentRail: "future_x402_gateway_citation_payment",
+    paymentRail: "mock_agent_wallet",
     tags: ["telemetry", "attestation", "device", "provenance"]
-  },
-  {
-    id: "blocked-scrape-cache",
-    title: "Blocked scrape cache",
-    creatorName: "Blocked Source",
-    recipient: "blocked-recipient.demo",
-    description: "Denied source example for private scrape cache content.",
-    price: "0.04",
-    currency: "USDC",
-    scenario: "data_access",
-    paymentRail: "future_x402_gateway_citation_payment",
-    tags: ["private", "scrape", "cache"]
   }
 ];
 
 export const citePayDemoPreset = {
-  label: "Lepton/CitePay demo preset",
-  agentId: "agent_citepay_demo_001",
-  query: "Need weather risk, climate claims, telemetry attestation, and private scrape cache context for an insurance answer",
-  budget: "0.24"
+  label: "Ignyte/Circle/Arc demo preset",
+  agentId: "agent_ignyte_demo_001",
+  query: "Research agent needs premium verification data, high-value evidence, telemetry attestation, and scraped cache context before publishing a thesis",
+  budget: "0.40"
 } as const;
 
 const tokenPattern = /[a-z0-9]+/g;
@@ -96,13 +96,13 @@ export function mapSourceToPaymentIntent(input: {
 }): PaymentIntent {
   return {
     agentId: input.agentId,
-    intent: `Pay ${input.source.price} ${input.source.currency} to cite ${input.source.creatorName} for ${input.source.title} in a CitePay answer about: ${input.query}`,
+    intent: `Pay ${input.source.price} ${input.source.currency} to access ${input.source.creatorName} for ${input.source.title} in an AgentPay Guard flow about: ${input.query}`,
     amount: input.source.price,
     currency: input.source.currency,
     recipient: input.source.recipient,
     scenario: input.source.scenario,
     paymentRail: input.source.paymentRail,
-    idempotencyKey: `citepay-${input.agentId}-${input.source.id}-${input.selectionRank}`
+    idempotencyKey: `agentpay-${input.agentId}-${input.source.id}-${input.selectionRank}`
   };
 }
 

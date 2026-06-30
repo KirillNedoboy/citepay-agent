@@ -1,33 +1,35 @@
 # ROADMAP.md
 
-## MVP
+## Current MVP
 
 - Deterministic policy engine.
-- `ALLOW / REVIEW / BLOCK`.
+- `ALLOW` / `REVIEW` / `BLOCK`.
 - JSONL audit log.
 - Demo UI.
-- 3 demo scenarios.
-- README + grant draft.
+- Circle/Arc rail preview adapter.
+- Ignyte/Circle/Arc demo scenarios.
+- README + proof-pack docs.
 
 ## After MVP
 
-### Milestone 1 — x402/Gateway adapter
+### Milestone 1 - x402/Gateway adapter
 
-Add an adapter that runs Guard before a mock or real x402 buyer flow.
+Extend the preview adapter into a buyer-side sandbox adapter after explicit approval.
 
-No real funds without explicit operator setup.
+No real funds without explicit operator setup, wallet/signing review, and separate tests.
 
-### Milestone 2 — Policy management
+### Milestone 2 - Policy management
 
 Add UI/API for editing:
 
 - per-agent limits;
 - recipient allowlist;
+- review-required recipients;
 - scenario allowlist;
 - denylist;
 - velocity rules.
 
-### Milestone 3 — Webhook/audit export
+### Milestone 3 - Webhook/audit export
 
 Add:
 
@@ -35,7 +37,7 @@ Add:
 - CSV/JSON export;
 - audit hash chain or Merkle-style digest.
 
-### Milestone 4 — Team/operator flow
+### Milestone 4 - Team/operator flow
 
 Add:
 
@@ -44,7 +46,7 @@ Add:
 - reviewer notes;
 - decision history.
 
-### Milestone 5 — Production hardening
+### Milestone 5 - Production hardening
 
 Add:
 
@@ -61,4 +63,5 @@ Add:
 - custody;
 - wallet private-key handling;
 - autonomous real-money execution by default;
+- fake transaction hashes;
 - smart contracts unless a specific audit anchoring requirement appears.

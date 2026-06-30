@@ -1,6 +1,7 @@
-import type { Decision } from "@/domain/payment-intent/types";
+import type { CircleRailPreview, Decision } from "@/domain/payment-intent/types";
 
 export type AuditRecord = {
+  eventType: "agent_payment_guard_evaluated";
   auditId: string;
   timestamp: string;
   idempotencyKey: string;
@@ -15,5 +16,8 @@ export type AuditRecord = {
   riskScore: number;
   policyId: string;
   matchedRules: string[];
+  reasonCodes: string[];
   reason: string;
+  executionMode: CircleRailPreview["executionMode"];
+  railPreview: CircleRailPreview;
 };

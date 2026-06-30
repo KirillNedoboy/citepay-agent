@@ -1,11 +1,11 @@
 {
-  "agentId": "device_telemetry_042",
-  "intent": "Device wants to pay $0.001 USDC for telemetry attestation",
-  "amount": "0.001",
+  "agentId": "agent_ignyte_demo_001",
+  "intent": "Buy high-value premium evidence bundle before publishing an agent-generated thesis",
+  "amount": "0.25",
   "currency": "USDC",
-  "recipient": "telemetry-attestation.demo",
-  "scenario": "machine_to_machine",
-  "paymentRail": "x402_gateway_nanopayment",
-  "idempotencyKey": "demo-review-machine-001",
+  "recipient": "premium-evidence-bundle.demo",
+  "scenario": "data_access",
+  "paymentRail": "mock_gateway_nanopayment",
+  "idempotencyKey": "ignyte-review-premium-dataset-001",
   "expectedDecision": "REVIEW"
 }

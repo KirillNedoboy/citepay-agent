@@ -1,109 +1,74 @@
-# CitePay Agent
+# AgentPay Guard
 
-> A local paid-source demo where an AI agent selects premium source cards, turns them into payment intents, and evaluates them through AgentPay Guard before any payment rail is used.
+> Preflight policy and audit layer for autonomous AI-agent USDC payment intents before x402, Circle Gateway, or Arc-compatible payment flows.
 
-## What this project is
+## What this is
 
-CitePay Agent is the **Lepton / Arc-facing demo branch** of AgentPay Guard.
+AgentPay Guard is a local deterministic proof for the Stablecoins Commerce Stack / agentic economy track.
 
-It shows a concrete agent workflow:
+It shows the control point before an agent spends:
 
-1. an agent needs premium or creator-owned sources for an answer;
-2. it selects relevant mock paid sources;
-3. each selected source becomes a normal payment intent;
-4. AgentPay Guard evaluates that intent as `ALLOW`, `REVIEW`, or `BLOCK`;
-5. the decision is written to a local JSONL audit log.
+1. an agent creates a USDC payment intent for a paid API, data source, or service;
+2. Guard validates the request and applies deterministic policy rules;
+3. Guard returns `ALLOW`, `REVIEW`, or `BLOCK`;
+4. Guard writes or reuses an append-only JSONL audit record;
+5. the UI shows a Circle/Arc rail preview without moving funds.
 
-This repo is a **local deterministic MVP and proof pack**. It demonstrates the policy-and-audit layer that can sit **before** future Arc / Circle / x402-style payment rails.
+This is not a live payment product. It is the guard and evidence layer before a future payment rail.
 
-## Why this matters
+## Implemented now
 
-AI agents may need to access premium research, creator-owned data, telemetry, or paid APIs.
+- Next.js / TypeScript local demo.
+- `POST /api/payment-intents/evaluate`.
+- `GET /api/audit-log`.
+- Decimal-string USDC amount handling.
+- Deterministic policy engine with trusted, review-required, unknown, and blocked recipient paths.
+- Circle/Arc rail preview adapter for:
+  - `mock_x402_service`;
+  - `mock_gateway_nanopayment`;
+  - `arc_settlement_preview`;
+  - `mock_agent_wallet`;
+  - unknown rails as `live_disabled`.
+- JSONL audit records with idempotency by `idempotencyKey`.
+- Demo preset with visible `ALLOW`, `REVIEW`, and `BLOCK` outcomes.
 
-But before an agent moves toward payment, builders need a deterministic preflight layer that can answer:
+## Not implemented
 
-- is this recipient trusted?
-- does the amount fit policy?
-- does the scenario match allowed usage?
-- does the intent require review?
-- is there a usable audit trail?
+- no real payment execution;
+- no live Circle Gateway call;
+- no live Arc integration;
+- no live x402 buyer or seller flow;
+- no wallet signing;
+- no custody or private keys;
+- no transaction hash fabrication;
+- no DB/auth/smart contracts;
+- no AML/KYC or fraud guarantee;
+- no official Circle, Arc, or Ignyte integration claim.
 
-CitePay Agent demonstrates that control point.
+## Demo story
 
-## What is implemented now
+A research agent needs paid evidence before publishing a thesis. It prepares USDC spend intents for:
 
-### User-facing demo
-- built-in CitePay / Lepton preset query;
-- built-in budget of `0.24 USDC`;
-- mock premium source cards;
-- deterministic source selection;
-- proposed spend versus allowed spend summary.
+- `Trusted x402 verification API` at `0.08 USDC` -> `ALLOW`;
+- `Premium evidence bundle` at `0.25 USDC` -> `REVIEW`;
+- `Untrusted scrape cache` at `0.04 USDC` -> `BLOCK`;
+- `Telemetry attestation note` at `0.03 USDC` -> `REVIEW`.
 
-### Guard integration
-- selected sources are converted into normal AgentPay Guard payment intents;
-- each intent is evaluated through `POST /api/payment-intents/evaluate`;
-- decisions return `ALLOW`, `REVIEW`, or `BLOCK`;
-- append-only JSONL audit logging with idempotency is preserved.
+The UI shows proposed spend, allowed spend, matched policy rules, audit IDs, and the preview-only rail metadata.
 
-### Proof-pack assets
-- screenshots for preset-loaded state, decisions, and spend summary;
-- Lepton-specific submission notes and video script in `docs/`.
-
-## What is explicitly not implemented
-
-This branch does **not** implement:
-
-- real payment settlement;
-- wallet signing;
-- live Arc integration;
-- live Circle Gateway integration;
-- live x402 buyer or seller flows;
-- custody or private key handling;
-- DB / auth;
-- smart contracts;
-- creator payouts;
-- production fraud, AML, or compliance guarantees.
-
-This is a **payment-intent guard demo**, not a live payment product.
-
-## Demo flow
-
-### Preset query
-
-```txt
-Need weather risk, climate claims, telemetry attestation, and private scrape cache context for an insurance answer
-```
-
-### Preset budget
-
-```txt
-0.24 USDC
-```
-
-### Expected demo behavior
-
-- `Weather risk brief` -> `ALLOW`
-- `Climate claims dataset` -> `REVIEW`
-- `Blocked scrape cache` -> `BLOCK`
-- `Telemetry attestation note` -> `REVIEW`
-- `Market data note` -> `not_relevant`
-
-### Spend summary
-
-- proposed spend: `0.24 USDC`
-- allowed spend: `0.08 USDC`
-
-## Architecture in one screen
+## Architecture
 
 ```txt
 Agent workflow
-  -> source selection
-  -> payment intent creation
+  -> paid API/data/service source
+  -> payment intent
   -> AgentPay Guard policy evaluation
   -> ALLOW / REVIEW / BLOCK
   -> JSONL audit record
-  -> future payment rail only if allowed
+  -> mock x402 / Circle Gateway / Arc rail preview
 ```
+
+Payment execution remains outside this MVP.
 
 ## Main API
 
@@ -111,15 +76,18 @@ Agent workflow
 POST /api/payment-intents/evaluate
 ```
 
-Typical response fields include:
+Typical response fields:
 
 - `decision`
 - `riskScore`
 - `reason`
 - `matchedRules`
+- `reasonCodes`
 - `policyId`
 - `auditId`
 - `createdAt`
+- `executionMode`
+- `railPreview`
 
 ## Repository structure
 
@@ -128,15 +96,15 @@ src/                         app, UI, API, guard logic
 examples/                    sample payment-intent scenarios
 data/policies.default.json   default policy config
 data/audit-log.jsonl         local append-only audit log
-docs/                        proof-pack, Lepton notes, scripts
+docs/                        architecture, demo, proof-pack notes
 screenshots/                 demo evidence
 ```
 
 ## Demo scenarios
 
-- `examples/scenario-allow-api.json` -> `ALLOW`
-- `examples/scenario-review-machine.json` -> `REVIEW`
-- `examples/scenario-block-risky.json` -> `BLOCK`
+- `examples/scenario-allow-api.json` -> trusted x402 API purchase -> `ALLOW`
+- `examples/scenario-review-machine.json` -> premium dataset review -> `REVIEW`
+- `examples/scenario-block-risky.json` -> untrusted source block -> `BLOCK`
 
 ## Run locally
 
@@ -155,54 +123,22 @@ Open:
 http://localhost:3000
 ```
 
-## Screenshots
+If port 3000 is busy, Next.js will print the alternate local URL.
 
-- [`screenshots/05-citepay-preset-loaded.png`](screenshots/05-citepay-preset-loaded.png)
-- [`screenshots/06-citepay-guard-decisions.png`](screenshots/06-citepay-guard-decisions.png)
-- [`screenshots/07-citepay-spend-summary.png`](screenshots/07-citepay-spend-summary.png)
-
-## Lepton / Arc fit
-
-This project fits Lepton as a **builder-facing proof for agentic paid-source selection plus payment-intent safety**.
-
-The core thesis is simple:
-
-> Agents may need to choose and pay for credible sources. CitePay Agent shows how those paid-source intents can be evaluated and audited before any payment rail is used.
-
-That makes the repo relevant to:
-
-- agent payments;
-- paid APIs / premium retrieval;
-- source monetization;
-- deterministic control layers before autonomous spend;
-- future Arc-native stablecoin workflows.
-
-## Recommended judge reading order
+## Recommended reviewer path
 
 1. `README.md`
-2. `docs/lepton-submission-draft.md`
-3. `docs/lepton-demo-video-script.md`
-4. `docs/proof-pack-checklist.md`
-5. `docs/architecture.md`
+2. `docs/ignyte-circle-arc-brief.md`
+3. `docs/architecture.md`
+4. `docs/demo-script.md`
+5. `docs/audit-log-schema.md`
+6. `data/policies.default.json`
+7. `tests/rail-preview.test.ts`
 
-## Related docs
+## Roadmap
 
-- [`docs/lepton-citepay-brief.md`](docs/lepton-citepay-brief.md)
-- [`docs/lepton-form-answers.md`](docs/lepton-form-answers.md)
-- [`docs/lepton-submission-draft.md`](docs/lepton-submission-draft.md)
-- [`docs/lepton-demo-video-script.md`](docs/lepton-demo-video-script.md)
-- [`docs/proof-pack-checklist.md`](docs/proof-pack-checklist.md)
-- [`docs/architecture.md`](docs/architecture.md)
-- [`docs/citepay-demo-script.md`](docs/citepay-demo-script.md)
-
-## Roadmap after the hackathon MVP
-
-Potential safe next steps:
-
-1. publish the submission proof pack;
-2. add a buyer-side adapter for a real future payment rail;
-3. add an operator review queue for `REVIEW` decisions;
-4. add policy editing and exportable audit reports;
-5. add webhook examples for agent frameworks.
-
-Live payment execution remains future work.
+- buyer-side x402/Gateway adapter after explicit approval;
+- operator review queue for `REVIEW`;
+- policy editor and audit export;
+- DB/auth/rate limiting for production hardening;
+- optional live sandbox integration only after wallet/signing/payment-execution scope is explicitly approved.

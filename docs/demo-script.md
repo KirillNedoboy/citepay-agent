@@ -1,8 +1,8 @@
-# Demo Script - AgentPay Guard
+# Demo Script - AgentPay Guard Ignyte / Circle / Arc
 
 ## Goal
 
-Run a two-minute demo showing that AgentPay Guard evaluates payment intents before an AI agent proceeds to x402 / Circle Gateway / Arc payment flow.
+Show in under two minutes that AgentPay Guard evaluates an agent's USDC payment intents before any x402, Circle Gateway, or Arc-compatible payment rail is used.
 
 ## Setup
 
@@ -10,125 +10,90 @@ Run a two-minute demo showing that AgentPay Guard evaluates payment intents befo
 pnpm dev
 ```
 
-Open:
+Open the local URL printed by Next.js, usually:
 
 ```txt
 http://localhost:3000
 ```
 
-## 2-Minute Flow
+## 0:00-0:20 - Opening
 
-### 0:00-0:20 - Opening
-
-Show the page title, scenario selector, form, decision card, and architecture strip.
+Show the title, live summary, and boundary card.
 
 Say:
 
-> AgentPay Guard is a preflight policy and audit layer for AI-agent payment intents. It does not move funds. It evaluates whether an agent payment should be allowed, reviewed, or blocked before the agent proceeds to x402, Circle Gateway, or Arc payment flow.
+> AgentPay Guard is a preflight policy and audit layer for AI-agent stablecoin payments. It decides whether a USDC spend intent is allowed, needs review, or must be blocked before any payment rail is reached.
 
-Point to the architecture strip:
+Point out the boundary:
+
+- no payment execution;
+- no wallet signing;
+- no private keys;
+- no fake transaction hash.
+
+## 0:20-0:55 - Run the preset
+
+Use the built-in `Ignyte/Circle/Arc demo preset`.
+
+Click:
 
 ```txt
-AI Agent -> AgentPay Guard -> x402 / Circle Gateway -> Paid API / Service
+Run demo
 ```
 
-### 0:20-0:45 - ALLOW: API Nanopayment
+Expected selected sources:
 
-Select:
+- `Trusted x402 verification API`
+- `Premium evidence bundle`
+- `Untrusted scrape cache`
+- `Telemetry attestation note`
 
-```txt
-API nanopayment
-```
+Expected skipped source:
 
-Click `Evaluate payment intent`.
+- `Market data note` -> `not_relevant`
 
-Expected:
+## 0:55-1:25 - Explain decisions
 
-- decision: `ALLOW`;
-- low risk score;
-- matched rules include allowlisted recipient and amount below limit;
-- audit id is visible.
+Point at the Guard decisions.
+
+Expected outcomes:
+
+- `Trusted x402 verification API` -> `ALLOW`
+- `Premium evidence bundle` -> `REVIEW`
+- `Untrusted scrape cache` -> `BLOCK`
+- `Telemetry attestation note` -> `REVIEW`
 
 Say:
 
-> This is a tiny USDC API payment to a known recipient in an allowed scenario. Guard returns ALLOW and records the decision in the audit log.
+> The same agent workflow produces different decisions because policy looks at recipient trust, purpose, amount thresholds, and blocked recipients. Only the trusted low-value API request is allowed.
 
-Scenario file:
+## 1:25-1:45 - Show rail preview
 
-```txt
-examples/scenario-allow-api.json
-```
+Point at the rail preview fields for evaluated sources or validator output.
 
-### 0:45-1:10 - REVIEW: Machine-to-Machine Payment
+Expected fields:
 
-Select:
-
-```txt
-Machine-to-machine payment
-```
-
-Click `Evaluate payment intent`.
-
-Expected:
-
-- decision: `REVIEW`;
-- medium risk score;
-- matched rules include recipient requires review;
-- audit id is visible.
+- rail label;
+- settlement asset `USDC`;
+- execution mode `mock_preview` or `live_disabled`;
+- recipient;
+- amount;
+- preview-only explanation.
 
 Say:
 
-> This payment is small, but the recipient requires operator review. Guard does not block it outright, but it prevents fully autonomous execution.
+> This is a preview adapter, not settlement. It shows how the allowed intent could be prepared for an x402, Circle Gateway, or Arc-compatible flow later, but this demo does not move funds or call live payment APIs.
 
-Scenario file:
+## 1:45-2:00 - Show audit proof
 
-```txt
-examples/scenario-review-machine.json
-```
-
-### 1:10-1:35 - BLOCK: Risky Autonomous Spend
-
-Select:
-
-```txt
-Risky autonomous spend
-```
-
-Click `Evaluate payment intent`.
-
-Expected:
-
-- decision: `BLOCK`;
-- high risk score;
-- matched rules include amount above hard max, unknown scenario, and suspicious keywords;
-- audit id is visible.
+Expand or point at the audit log.
 
 Say:
 
-> This intent is high value, unknown, and risky. Guard blocks it before any payment rail is reached. No funds move.
+> Each successful evaluation writes or reuses a JSONL audit record. The record includes policy evidence and rail preview metadata, but no secrets, signatures, or transaction hashes.
 
-Scenario file:
-
-```txt
-examples/scenario-block-risky.json
-```
-
-### 1:35-1:50 - Show Audit Log
-
-Scroll to or point at `Recent audit log`.
-
-Say:
-
-> Each successful evaluation writes or reuses a JSONL audit record. Reusing the same idempotency key returns the same audit record instead of duplicating the log.
-
-Mention the file:
+Mention:
 
 ```txt
 data/audit-log.jsonl
 ```
-
-### 1:50-2:00 - Closing
-
-Say:
-
-> AgentPay Guard complements Arc, Circle Gateway, and x402-style payment flows by adding deterministic policy and auditability before payment execution. It is not a wallet or payment rail; it is the guard layer before the rail.

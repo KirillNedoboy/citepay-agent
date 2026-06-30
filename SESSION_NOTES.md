@@ -832,3 +832,52 @@ Pending fresh verification:
 - `pnpm build`
 
 No staging or commit before those commands pass.
+
+## 2026-06-30 - Ignyte / Circle / Arc stabilization checkpoint
+
+### Context
+
+Continued the interrupted `feature/ignyte-circle-arc-preview` implementation in stabilization/completion mode.
+
+Branch and HEAD before cleanup:
+
+- Branch: `feature/ignyte-circle-arc-preview`
+- HEAD: `61dcdf7`
+
+### What was stabilized
+
+- Preserved the broad intentional AgentPay Guard Ignyte / Circle / Arc diff.
+- Confirmed `PRODUCT.md`, `docs/ignyte-circle-arc-brief.md`, `src/domain/payment-intent/rail-preview.ts`, and `tests/rail-preview.test.ts` are intentional files, not generated artifacts.
+- Removed only untracked generated browser artifacts:
+  - `.playwright-cli/`
+  - `output/playwright/`
+- Restored generated Next.js drift in `next-env.d.ts`; the only diff was the route type import changing between `.next/dev/types/routes.d.ts` and `.next/types/routes.d.ts`.
+
+### Validation results
+
+- `pnpm test`: passed, 6 test files and 34 tests.
+- `pnpm lint`: passed.
+- `pnpm typecheck`: passed.
+- `pnpm build`: passed.
+- `pnpm build` regenerated `next-env.d.ts` with the route type import pointing at `.next/types/routes.d.ts`; this generated-only drift was restored.
+- `pnpm typecheck` after restoring `next-env.d.ts`: passed.
+
+### Safety scan status
+
+The safety scan matched boundary and non-goal language only, including explicit statements that the project does not move funds, sign transactions, hold private keys, create transaction hashes, or claim live/official Circle, Arc, or x402 integration.
+
+### Boundary kept intact
+
+- No live Circle Gateway call.
+- No live Arc integration.
+- No live x402 buyer/seller flow.
+- No wallet custody.
+- No private keys.
+- No signing.
+- No swaps, trading, order execution, or background spend jobs.
+- No fake transaction hashes.
+- No official integration claim.
+
+### Commit status
+
+Pending final diff inspection and commit.

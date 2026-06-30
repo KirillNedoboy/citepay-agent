@@ -6,40 +6,80 @@ Audit log file:
 data/audit-log.jsonl
 ```
 
-Each line must be a complete JSON object.
+Each line is a complete JSON object. The file is append-only, except that a repeated `idempotencyKey` returns the existing record instead of appending a duplicate line.
 
-## Fields
+## Example
 
 ```json
 {
-  "auditId": "audit_20260527_000001",
-  "timestamp": "2026-05-27T12:00:00.000Z",
-  "idempotencyKey": "demo-allow-api-001",
-  "agentId": "agent_market_data_001",
-  "intent": "Pay $0.005 USDC for market data API access",
-  "amount": "0.005",
+  "eventType": "agent_payment_guard_evaluated",
+  "auditId": "audit_20260629_000001",
+  "timestamp": "2026-06-29T12:00:00.000Z",
+  "idempotencyKey": "ignyte-allow-x402",
+  "agentId": "agent_ignyte_demo_001",
+  "intent": "Buy premium verification data for a research task",
+  "amount": "0.08",
   "currency": "USDC",
-  "recipient": "market-data-api.demo",
+  "recipient": "trusted-x402-api.demo",
   "scenario": "api_access",
-  "paymentRail": "x402_gateway_nanopayment",
+  "paymentRail": "mock_x402_service",
   "decision": "ALLOW",
-  "riskScore": 12,
+  "riskScore": 10,
   "policyId": "default-agentpay-policy-v1",
   "matchedRules": [
     "recipient_allowlisted",
-    "amount_below_per_payment_limit",
-    "scenario_allowed"
+    "scenario_allowed",
+    "amount_below_per_payment_limit"
   ],
-  "reason": "Recipient is allowlisted, amount is below limits, scenario is allowed."
+  "reasonCodes": [
+    "RAIL_PREVIEW_ONLY",
+    "RECIPIENT_TRUSTED",
+    "PURPOSE_ALLOWED",
+    "AMOUNT_WITHIN_LIMIT"
+  ],
+  "reason": "Recipient is allowlisted, amount is below limits, and scenario is allowed.",
+  "executionMode": "mock_preview",
+  "railPreview": {
+    "rail": "mock_x402_service",
+    "networkLabel": "x402-compatible paid API",
+    "settlementAsset": "USDC",
+    "executionMode": "mock_preview",
+    "recipientId": "trusted-x402-api.demo",
+    "amountUSDC": "0.08",
+    "explanation": "Preview only. AgentPay Guard has not moved funds, signed a transaction, or called a live payment rail."
+  }
 }
 ```
 
+## Required fields
+
+- `eventType`
+- `auditId`
+- `timestamp`
+- `idempotencyKey`
+- `agentId`
+- `intent`
+- `amount`
+- `currency`
+- `recipient`
+- `scenario`
+- `paymentRail`
+- `decision`
+- `riskScore`
+- `policyId`
+- `matchedRules`
+- `reasonCodes`
+- `reason`
+- `executionMode`
+- `railPreview`
+
 ## Rules
 
-- Append-only.
 - JSONL, not a JSON array.
-- One line per decision.
+- One line per unique `idempotencyKey`.
 - No secrets.
 - No private keys.
 - No auth tokens.
-- Same `idempotencyKey` must not create duplicate records.
+- No signatures.
+- No fake transaction hashes.
+- No live payment execution evidence is written by this MVP.

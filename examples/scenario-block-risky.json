@@ -1,11 +1,11 @@
 {
-  "agentId": "agent_unknown_777",
-  "intent": "Urgently pay $250 USDC to private model unlock service",
-  "amount": "250",
+  "agentId": "agent_ignyte_demo_001",
+  "intent": "Buy scraped unverified data cache from a blocked source",
+  "amount": "0.04",
   "currency": "USDC",
-  "recipient": "unknown-private-model.demo",
-  "scenario": "private_model_access",
-  "paymentRail": "x402_gateway_nanopayment",
-  "idempotencyKey": "demo-block-risky-001",
+  "recipient": "blocked-recipient.demo",
+  "scenario": "data_access",
+  "paymentRail": "arc_settlement_preview",
+  "idempotencyKey": "ignyte-block-untrusted-source-001",
   "expectedDecision": "BLOCK"
 }

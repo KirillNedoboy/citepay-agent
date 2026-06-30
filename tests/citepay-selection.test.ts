@@ -14,58 +14,58 @@ const policy = loadPolicyConfig("data/policies.default.json");
 describe("CitePay source selection", () => {
   test("selects paid sources by deterministic query relevance", () => {
     const result = selectCitePaySources({
-      agentId: "agent_citepay_demo_001",
-      query: "Need weather and climate risk data for an insurance answer",
-      budget: "0.25",
+      agentId: "agent_ignyte_demo_001",
+      query: "Need verification data and premium evidence for an agent research task",
+      budget: "0.35",
       sources: citePayMockSources
     });
 
     expect(result.selected.map((item) => item.source.id)).toEqual([
-      "weather-risk-brief",
-      "climate-claims-dataset"
+      "trusted-x402-verification-api",
+      "premium-evidence-bundle"
     ]);
     expect(result.skipped.find((item) => item.source.id === "market-data-note")?.reason).toBe("not_relevant");
   });
 
   test("skips relevant sources that exceed the decimal-string budget cap", () => {
     const result = selectCitePaySources({
-      agentId: "agent_citepay_demo_001",
-      query: "Need weather and climate risk data for an insurance answer",
+      agentId: "agent_ignyte_demo_001",
+      query: "Need verification data and premium evidence for an agent research task",
       budget: "0.10",
       sources: citePayMockSources
     });
 
-    expect(result.selected.map((item) => item.source.id)).toEqual(["weather-risk-brief"]);
+    expect(result.selected.map((item) => item.source.id)).toEqual(["trusted-x402-verification-api"]);
     expect(result.totalProposedSpend).toBe("0.08");
-    expect(result.skipped.find((item) => item.source.id === "climate-claims-dataset")?.reason).toBe("budget_cap");
+    expect(result.skipped.find((item) => item.source.id === "premium-evidence-bundle")?.reason).toBe("budget_cap");
   });
 
   test("maps selected sources to existing Guard-compatible payment intents", () => {
-    const source = citePayMockSources.find((item) => item.id === "weather-risk-brief");
+    const source = citePayMockSources.find((item) => item.id === "trusted-x402-verification-api");
     expect(source).toBeDefined();
 
     const intent = mapSourceToPaymentIntent({
       agentId: "agent_citepay_demo_001",
-      query: "Need weather risk data",
+      query: "Need verification data",
       source: source!,
       selectionRank: 1
     });
 
     expect(intent).toEqual({
       agentId: "agent_citepay_demo_001",
-      intent: "Pay 0.08 USDC to cite Weather Desk for Weather risk brief in a CitePay answer about: Need weather risk data",
+      intent: "Pay 0.08 USDC to access Verity API for Trusted x402 verification API in an AgentPay Guard flow about: Need verification data",
       amount: "0.08",
       currency: "USDC",
-      recipient: "weather-api.demo",
-      scenario: "data_access",
-      paymentRail: "future_x402_gateway_citation_payment",
-      idempotencyKey: "citepay-agent_citepay_demo_001-weather-risk-brief-1"
+      recipient: "trusted-x402-api.demo",
+      scenario: "api_access",
+      paymentRail: "mock_x402_service",
+      idempotencyKey: "agentpay-agent_citepay_demo_001-trusted-x402-verification-api-1"
     });
   });
 
   test("preserves REVIEW and BLOCK decisions from the existing Guard policy", () => {
-    const reviewSource = citePayMockSources.find((item) => item.id === "telemetry-attestation-note");
-    const blockedSource = citePayMockSources.find((item) => item.id === "blocked-scrape-cache");
+    const reviewSource = citePayMockSources.find((item) => item.id === "premium-evidence-bundle");
+    const blockedSource = citePayMockSources.find((item) => item.id === "untrusted-scrape-cache");
     expect(reviewSource).toBeDefined();
     expect(blockedSource).toBeDefined();
 
@@ -95,14 +95,14 @@ describe("CitePay source selection", () => {
     });
 
     expect(citePayDemoPreset.query).toBe(
-      "Need weather risk, climate claims, telemetry attestation, and private scrape cache context for an insurance answer"
+      "Research agent needs premium verification data, high-value evidence, telemetry attestation, and scraped cache context before publishing a thesis"
     );
-    expect(citePayDemoPreset.budget).toBe("0.24");
-    expect(result.totalProposedSpend).toBe("0.24");
+    expect(citePayDemoPreset.budget).toBe("0.40");
+    expect(result.totalProposedSpend).toBe("0.4");
     expect(result.selected.map((item) => item.source.id)).toEqual([
-      "weather-risk-brief",
-      "climate-claims-dataset",
-      "blocked-scrape-cache",
+      "trusted-x402-verification-api",
+      "premium-evidence-bundle",
+      "untrusted-scrape-cache",
       "telemetry-attestation-note"
     ]);
     expect(result.skipped.find((item) => item.source.id === "market-data-note")?.reason).toBe("not_relevant");
@@ -114,9 +114,9 @@ describe("CitePay source selection", () => {
     }));
 
     expect(evaluated.map((item) => [item.sourceId, item.decision])).toEqual([
-      ["weather-risk-brief", "ALLOW"],
-      ["climate-claims-dataset", "REVIEW"],
-      ["blocked-scrape-cache", "BLOCK"],
+      ["trusted-x402-verification-api", "ALLOW"],
+      ["premium-evidence-bundle", "REVIEW"],
+      ["untrusted-scrape-cache", "BLOCK"],
       ["telemetry-attestation-note", "REVIEW"]
     ]);
     expect(addDecimalStrings(evaluated.filter((item) => item.decision === "ALLOW").map((item) => item.amount))).toBe("0.08");

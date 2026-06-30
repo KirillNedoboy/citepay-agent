@@ -1,5 +1,28 @@
 export type Decision = "ALLOW" | "REVIEW" | "BLOCK";
 
+export type CircleRail =
+  | "mock_agent_wallet"
+  | "mock_gateway_nanopayment"
+  | "mock_x402_service"
+  | "arc_settlement_preview";
+
+export type PaymentPurpose =
+  | "premium_research_source"
+  | "api_data_purchase"
+  | "agent_to_agent_service"
+  | "verification_or_attestation"
+  | "unknown";
+
+export type CircleRailPreview = {
+  rail: CircleRail;
+  networkLabel: string;
+  settlementAsset: "USDC";
+  executionMode: "mock_preview" | "sandbox_ready" | "live_disabled";
+  recipientId: string;
+  amountUSDC: string;
+  explanation: string;
+};
+
 export type PaymentIntent = {
   agentId: string;
   intent: string;
@@ -16,5 +39,6 @@ export type PolicyDecision = {
   riskScore: number;
   reason: string;
   matchedRules: string[];
+  reasonCodes: string[];
   policyId: string;
 };

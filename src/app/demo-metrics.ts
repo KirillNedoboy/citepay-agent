@@ -1,4 +1,5 @@
 import type { CitePaySelectedSource, CitePaySelectionResult } from "@/domain/citepay/types";
+import type { CircleRailPreview } from "@/domain/payment-intent/types";
 import { addDecimalStrings } from "@/lib/decimal";
 
 export type DemoEvaluationResult = {
@@ -19,6 +20,8 @@ export type DemoSummary = {
   selectedCount: number;
 };
 
+export type RailPreviewRow = [label: string, value: string];
+
 export function buildDemoSummary(
   selection: CitePaySelectionResult | null,
   evaluations: DemoEvaluatedSource[]
@@ -37,4 +40,18 @@ export function buildDemoSummary(
     approvedCount,
     selectedCount: selection?.selected.length ?? 0
   };
+}
+
+export function buildRailPreviewRows(preview: CircleRailPreview | undefined): RailPreviewRow[] {
+  if (!preview) {
+    return [];
+  }
+
+  return [
+    ["Rail", preview.networkLabel],
+    ["Asset", preview.settlementAsset],
+    ["Mode", preview.executionMode],
+    ["Recipient", preview.recipientId],
+    ["Amount", `${preview.amountUSDC} ${preview.settlementAsset}`]
+  ];
 }

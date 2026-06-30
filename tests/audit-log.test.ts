@@ -64,13 +64,23 @@ describe("audit log", () => {
     const records = readRecentAuditRecords(auditPath, 10);
     expect(records).toHaveLength(1);
     expect(records[0]).toMatchObject({
+      eventType: "agent_payment_guard_evaluated",
       idempotencyKey: "jsonl-required-fields",
       agentId: "device_telemetry_042",
       amount: "0.001",
       currency: "USDC",
       decision: "REVIEW",
-      policyId: "default-agentpay-policy-v1"
+      policyId: "default-agentpay-policy-v1",
+      executionMode: "mock_preview",
+      railPreview: {
+        settlementAsset: "USDC",
+        executionMode: "mock_preview",
+        recipientId: "telemetry-attestation.demo",
+        amountUSDC: "0.001"
+      }
     });
+    expect(records[0].reasonCodes).toContain("RAIL_PREVIEW_ONLY");
+    expect(JSON.stringify(records[0])).not.toMatch(/transactionHash|txHash|signature|privateKey|seedPhrase/i);
     expect(records[0].auditId).toMatch(/^audit_/);
     expect(Date.parse(records[0].timestamp)).not.toBeNaN();
   });

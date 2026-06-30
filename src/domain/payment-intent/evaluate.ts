@@ -1,6 +1,6 @@
 import { createOrReuseAuditRecord, readRecentAuditRecords } from "@/domain/audit/audit-log";
 import type { AuditRecord } from "@/domain/audit/types";
-import type { PolicyDecision } from "@/domain/payment-intent/types";
+import type { CircleRailPreview, PolicyDecision } from "@/domain/payment-intent/types";
 import { validatePaymentIntent, ValidationError } from "@/domain/payment-intent/validation";
 import { evaluatePolicy } from "@/domain/policy/engine";
 import { loadPolicyConfig } from "@/domain/policy/policy-config";
@@ -9,6 +9,8 @@ import { auditLogPath, policyPath } from "@/lib/paths";
 export type EvaluationResponse = PolicyDecision & {
   auditId: string;
   createdAt: string;
+  executionMode: CircleRailPreview["executionMode"];
+  railPreview: CircleRailPreview;
 };
 
 export async function evaluatePaymentIntent(input: unknown): Promise<EvaluationResponse> {
@@ -23,9 +25,12 @@ export async function evaluatePaymentIntent(input: unknown): Promise<EvaluationR
     riskScore: audit.riskScore,
     reason: audit.reason,
     matchedRules: audit.matchedRules,
+    reasonCodes: audit.reasonCodes,
     policyId: audit.policyId,
     auditId: audit.auditId,
-    createdAt: audit.timestamp
+    createdAt: audit.timestamp,
+    executionMode: audit.executionMode,
+    railPreview: audit.railPreview
   };
 }
 

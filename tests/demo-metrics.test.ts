@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { buildDemoSummary } from "@/app/demo-metrics";
+import { buildDemoSummary, buildRailPreviewRows } from "@/app/demo-metrics";
 
 describe("buildDemoSummary", () => {
   test("returns zeroed summary before any selection or evaluations", () => {
@@ -35,5 +35,31 @@ describe("buildDemoSummary", () => {
       approvedCount: 1,
       selectedCount: 3
     });
+  });
+});
+
+describe("buildRailPreviewRows", () => {
+  test("returns compact UI rows for preview-only rail evidence", () => {
+    expect(
+      buildRailPreviewRows({
+        rail: "mock_gateway_nanopayment",
+        networkLabel: "Circle Gateway Nanopayment preview",
+        settlementAsset: "USDC",
+        executionMode: "mock_preview",
+        recipientId: "premium-evidence-bundle.demo",
+        amountUSDC: "0.25",
+        explanation: "Preview only. AgentPay Guard has not moved funds, signed a transaction, or called a live payment rail."
+      })
+    ).toEqual([
+      ["Rail", "Circle Gateway Nanopayment preview"],
+      ["Asset", "USDC"],
+      ["Mode", "mock_preview"],
+      ["Recipient", "premium-evidence-bundle.demo"],
+      ["Amount", "0.25 USDC"]
+    ]);
+  });
+
+  test("returns no rows when the API response has no rail preview", () => {
+    expect(buildRailPreviewRows(undefined)).toEqual([]);
   });
 });
